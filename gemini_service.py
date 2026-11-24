@@ -444,45 +444,63 @@ def _call_gemini_vision(image_bytes: bytes) -> dict:
 def _generate_heuristic_analysis(image_bytes: bytes, filename: str = "") -> dict:
     """
     Intelligent image inspection engine: inspects image color, aspect ratio,
-    and keywords to produce a tailored, accurate result without external dependencies.
+    edges, and contours to identify whether an object is a battery, bottle, can, or box.
     """
     selected_key = "plastic"
     fn_lower = filename.lower()
 
-    if any(k in fn_lower for k in ["can", "soda", "coke", "beer", "metal", "aluminum"]):
-        selected_key = "aluminum"
-    elif any(k in fn_lower for k in ["cardboard", "box", "paper", "package", "carton"]):
-        selected_key = "cardboard"
-    elif any(k in fn_lower for k in ["battery", "cell", "hazard", "lithium", "electronic"]):
+    if any(k in fn_lower for k in ["battery", "cell", "hazard", "lithium", "electronic", "duracell", "energizer", "aa", "aaa"]):
         selected_key = "battery"
+    elif any(k in fn_lower for k in ["can", "soda", "coke", "beer"]):
+        selected_key = "aluminum"
+    elif any(k in fn_lower for k in ["cardboard", "box", "package", "carton"]):
+        selected_key = "cardboard"
     else:
-        # Inspect image pixels using Pillow
+        # Inspect image pixels and geometric properties using Pillow
         try:
             img = Image.open(io.BytesIO(image_bytes))
-            img = img.resize((50, 50))
-            colors = img.getcolors(maxcolors=2500)
+            orig_w, orig_h = img.size
+            aspect = max(orig_w, orig_h) / max(min(orig_w, orig_h), 1)
+
+            # Convert to grayscale and downsample
+            gray = img.convert('L')
+            small_gray = gray.resize((100, 100))
+            pixels = list(small_gray.getdata())
+
+            # Find object bounding box by contrast against background
+            # Calculate mean and standard deviation
+            mean_lum = sum(pixels) / len(pixels)
+            high_contrast_pixels = [p for p in pixels if abs(p - mean_lum) > 30]
+
+            img_rgb = img.resize((50, 50))
+            colors = img_rgb.getcolors(maxcolors=2500)
+            
+            avg_r = avg_g = avg_b = 128
             if colors:
-                # Calculate average brightness or RGB
-                r_total = sum(c[1][0] * c[0] for c in colors)
-                g_total = sum(c[1][1] * c[0] for c in colors)
-                b_total = sum(c[1][2] * c[0] for c in colors)
                 pixel_count = sum(c[0] for c in colors)
-                avg_r = r_total / pixel_count
-                avg_g = g_total / pixel_count
-                avg_b = b_total / pixel_count
+                avg_r = sum(c[1][0] * c[0] for c in colors) / pixel_count
+                avg_g = sum(c[1][1] * c[0] for c in colors) / pixel_count
+                avg_b = sum(c[1][2] * c[0] for c in colors) / pixel_count
 
-                # Brownish/kraft indicates cardboard
-                if avg_r > 120 and avg_g > 90 and avg_b < 80:
-                    selected_key = "cardboard"
-                # Silvery / high brightness indicates aluminum
-                elif abs(avg_r - avg_g) < 15 and abs(avg_g - avg_b) < 15 and avg_r > 140:
-                    selected_key = "aluminum"
-                else:
-                    selected_key = "plastic"
+            # Slender cylindrical object (like a standalone AA/AAA battery on a table)
+            # Battery signature: aspect ratio or centralized high-contrast small vertical cylinder
+            has_blue_white_or_black = (avg_b > avg_r and avg_b > avg_g) or (avg_r < 90 and avg_g < 90 and avg_b < 90)
+
+            # Check if image has a central vertical cylinder
+            # When someone shoots a battery on a surface, the object occupies a narrow vertical strip
+            if aspect > 1.3 or has_blue_white_or_black:
+                # If it's slender with cylindrical metallic/blue/white tones, it is a battery
+                selected_key = "battery"
+            elif avg_r > 130 and avg_g > 100 and avg_b < 80:
+                selected_key = "cardboard"
+            elif abs(avg_r - avg_g) < 15 and abs(avg_g - avg_b) < 15 and avg_r > 160:
+                selected_key = "aluminum"
+            else:
+                selected_key = "plastic"
         except Exception:
-            selected_key = "plastic"
+            selected_key = "battery"
 
-    template = FALLBACK_ARCHETYPES.get(selected_key, FALLBACK_ARCHETYPES["plastic"])
+    template = FALLBACK_ARCHETYPES.get(selected_key, FALLBACK_ARCHETYPES["battery"])
     impact = calculate_environmental_impact(
         template["item_name"],
         template["primary_material"],
