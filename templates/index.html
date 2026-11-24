@@ -188,44 +188,311 @@
     <!-- ================= VIEW 2: SCANNER ================= -->
     <section id="view-scanner" class="tab-content hidden">
       <div class="max-w-3xl mx-auto">
-        <div class="text-center mb-8">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-eco-100 text-eco-800 text-xs font-bold mb-2">
+            <i data-lucide="scan-search" class="w-3.5 h-3.5 text-eco-600"></i>
+            <span>Unified Waste Identification Suite</span>
+          </div>
           <h2 class="text-3xl font-extrabold text-slate-900">Waste Material Scanner</h2>
-          <p class="mt-2 text-slate-600">Upload a photo of your discarded object or take a live camera shot.</p>
+          <p class="mt-1 text-slate-600 text-sm">Choose your preferred method to identify materials and generate upcycling blueprints.</p>
         </div>
 
-        <!-- Dropzone Card -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          
-          <!-- File Drop / Select Area -->
-          <div id="drop-area" class="relative border-2 border-dashed border-slate-300 hover:border-eco-500 rounded-xl p-8 text-center transition-all bg-slate-50/50 cursor-pointer group">
-            <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-            
-            <div id="upload-placeholder" class="space-y-3">
-              <div class="w-16 h-16 rounded-full bg-eco-100 text-eco-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
-                <i data-lucide="upload-cloud" class="w-8 h-8"></i>
-              </div>
-              <div>
-                <p class="font-semibold text-slate-800 text-base">Drag & drop your waste photo here, or <span class="text-eco-600 underline">browse</span></p>
-                <p class="text-xs text-slate-600 mt-1">Supports JPEG, PNG, WEBP (Max 5MB)</p>
-              </div>
-            </div>
+        <!-- 5 Unified Identification Method Tabs -->
+        <div class="bg-slate-200/80 p-1.5 rounded-2xl flex items-center justify-between gap-1 mb-6 shadow-inner">
+          <button id="mode-tab-camera" type="button" onclick="setScannerMode('camera')" class="scanner-mode-tab flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1 text-slate-700 hover:text-eco-700">
+            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+            <span>Camera</span>
+          </button>
+          <button id="mode-tab-upload" type="button" onclick="setScannerMode('upload')" class="scanner-mode-tab flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1 bg-white text-eco-700 shadow-sm">
+            <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+            <span>Upload</span>
+          </button>
+          <button id="mode-tab-barcode" type="button" onclick="setScannerMode('barcode')" class="scanner-mode-tab flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1 text-slate-700 hover:text-eco-700">
+            <i data-lucide="barcode" class="w-3.5 h-3.5"></i>
+            <span>Barcode/QR</span>
+          </button>
+          <button id="mode-tab-text" type="button" onclick="setScannerMode('text')" class="scanner-mode-tab flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1 text-slate-700 hover:text-eco-700">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>Text</span>
+          </button>
+          <button id="mode-tab-manual" type="button" onclick="setScannerMode('manual')" class="scanner-mode-tab flex-1 py-2.5 px-2 sm:px-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1 text-slate-700 hover:text-eco-700">
+            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+            <span>Manual</span>
+          </button>
+        </div>
 
-            <!-- Preview Box with Scanning Laser -->
-            <div id="preview-container" class="hidden relative rounded-lg overflow-hidden max-h-80 mx-auto inline-block">
-              <img id="preview-image" src="" alt="Waste Preview" class="rounded-lg object-contain max-h-80 mx-auto">
-              <!-- Laser scan line animation -->
-              <div id="scanner-laser" class="laser-beam hidden"></div>
+        <!-- Main Scanner Card -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm transition-all">
+
+          <!-- ================= METHOD 1: CAMERA ================= -->
+          <div id="method-panel-camera" class="method-panel hidden space-y-4">
+            <div class="text-center p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+              <div class="relative w-full max-w-md mx-auto aspect-video bg-slate-900 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+                <video id="live-camera-preview" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+                <canvas id="camera-capture-canvas" class="hidden"></canvas>
+                <div id="camera-standby-view" class="text-center p-6 space-y-3">
+                  <div class="w-16 h-16 rounded-2xl bg-slate-800 text-eco-400 mx-auto flex items-center justify-center">
+                    <i data-lucide="camera" class="w-8 h-8"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-white text-sm">Direct Camera Access</h4>
+                    <p class="text-xs text-slate-400 mt-1">Click Start Camera to initialize your device camera stream.</p>
+                  </div>
+                  <button type="button" onclick="startInlineCamera()" class="px-5 py-2.5 bg-eco-600 hover:bg-eco-700 text-white rounded-xl text-xs font-bold shadow-md shadow-eco-600/30 transition flex items-center justify-center gap-2 mx-auto">
+                    <i data-lucide="video" class="w-4 h-4"></i>
+                    <span>Start Camera</span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="camera-active-controls" class="hidden mt-4 flex items-center justify-center gap-3">
+                <button type="button" onclick="captureInlineSnapshot()" class="px-6 py-2.5 bg-eco-600 hover:bg-eco-700 text-white rounded-xl text-sm font-bold shadow-md shadow-eco-600/30 transition flex items-center gap-2">
+                  <i data-lucide="aperture" class="w-4 h-4"></i>
+                  <span>Snap Photo</span>
+                </button>
+                <button type="button" onclick="stopInlineCamera()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition">
+                  Stop Camera
+                </button>
+              </div>
+
+              <div id="camera-permission-alert" class="hidden mt-3 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2 text-left">
+                <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+                <span id="camera-error-message">Camera access denied. Please grant permission in browser settings.</span>
+              </div>
             </div>
           </div>
 
-          <!-- Camera Capture Alternative -->
-          <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <button type="button" onclick="openCameraModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition flex items-center justify-center gap-2">
-              <i data-lucide="camera" class="w-4 h-4 text-eco-600"></i>
-              <span>Use Webcam / Phone Camera</span>
+          <!-- ================= METHOD 2: IMAGE UPLOAD ================= -->
+          <div id="method-panel-upload" class="method-panel space-y-4">
+            <div id="drop-area" class="relative border-2 border-dashed border-slate-300 hover:border-eco-500 rounded-2xl p-8 sm:p-10 text-center transition-all bg-slate-50/60 cursor-pointer group">
+              <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+              
+              <div id="upload-placeholder" class="space-y-3">
+                <div class="w-16 h-16 rounded-2xl bg-eco-100 text-eco-600 mx-auto flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                </div>
+                <div>
+                  <p class="font-bold text-slate-800 text-base">Drag & drop your waste photo here, or <span class="text-eco-600 underline">browse</span></p>
+                  <p class="text-xs text-slate-600 mt-1">Supports JPEG, PNG, WEBP, HEIC (Max 6MB)</p>
+                </div>
+              </div>
+
+              <div id="preview-container" class="hidden relative rounded-xl overflow-hidden max-h-80 mx-auto inline-block border border-slate-200 shadow-md">
+                <img id="preview-image" src="" alt="Waste Preview" class="rounded-xl object-contain max-h-80 mx-auto">
+                <div id="scanner-laser" class="laser-beam hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= METHOD 3: BARCODE & QR RECOGNITION ================= -->
+          <div id="method-panel-barcode" class="method-panel hidden space-y-4">
+            <div class="p-5 sm:p-6 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                    <i data-lucide="barcode" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-900 text-sm">Product Barcode & QR Code Verification</h4>
+                    <p class="text-xs text-slate-500">Scan packaging barcode to retrieve verified manufacturer & material data</p>
+                  </div>
+                </div>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  Verified Registry
+                </span>
+              </div>
+
+              <!-- Barcode Input + Lookup Button -->
+              <div class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-1">
+                  <input type="text" id="barcode-input-field" 
+                    placeholder="Enter or scan UPC / EAN (e.g. 5449000000996, 4060800000304)..."
+                    class="w-full rounded-xl border border-slate-300 py-3 pl-4 pr-10 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition font-mono"
+                    oninput="onBarcodeInputChanged()">
+                  <button type="button" onclick="clearBarcodeInput()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                  </button>
+                </div>
+                <button type="button" onclick="lookupScannedBarcode()" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition flex items-center justify-center gap-1.5 flex-shrink-0">
+                  <i data-lucide="search" class="w-4 h-4"></i>
+                  <span>Lookup Product</span>
+                </button>
+              </div>
+
+              <!-- 1-Click Samples -->
+              <div>
+                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Or test with verified packaging barcodes:</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <button type="button" onclick="setBarcodeSample('5449000000996')" class="text-xs px-2.5 py-1 bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🥤</span> <span>Coca-Cola 500ml PET</span>
+                  </button>
+                  <button type="button" onclick="setBarcodeSample('4060800000304')" class="text-xs px-2.5 py-1 bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🥫</span> <span>Pepsi 330ml Can</span>
+                  </button>
+                  <button type="button" onclick="setBarcodeSample('3068320114061')" class="text-xs px-2.5 py-1 bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🍶</span> <span>Evian 1.5L rPET</span>
+                  </button>
+                  <button type="button" onclick="setBarcodeSample('5000394002975')" class="text-xs px-2.5 py-1 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🔋</span> <span>Duracell AA 4-Pack</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Match Card -->
+              <div id="barcode-match-card" class="hidden p-4 rounded-xl bg-white border border-indigo-200 shadow-sm space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span id="barcode-match-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        VERIFIED MATCH
+                      </span>
+                      <span id="barcode-type-badge" class="text-[11px] text-slate-500 font-mono">EAN-13</span>
+                    </div>
+                    <h4 id="barcode-match-product" class="text-base font-bold text-slate-900 mt-1">Coca-Cola 500ml</h4>
+                    <p id="barcode-match-manufacturer" class="text-xs text-slate-600">The Coca-Cola Company</p>
+                  </div>
+                  <button type="button" onclick="openManualCorrectionModal()" class="text-xs text-indigo-600 hover:underline font-semibold flex items-center gap-1">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    <span>Edit Details</span>
+                  </button>
+                </div>
+
+                <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1.5 border border-slate-100">
+                  <div class="flex justify-between">
+                    <span class="text-slate-500 font-medium">Primary Material:</span>
+                    <span id="barcode-match-material" class="font-bold text-slate-800">Polyethylene Terephthalate (PET, #1)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500 font-medium">Registry Source:</span>
+                    <span id="barcode-match-source" class="text-slate-600">Open Food Facts & GS1 Verified</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Unmatched Alert -->
+              <div id="barcode-unmatched-card" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs space-y-2">
+                <div class="flex items-start gap-2">
+                  <i data-lucide="info" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                  <div class="flex-1">
+                    <span class="font-bold text-amber-900" id="barcode-unmatched-title">No verified product match found</span>
+                    <p class="text-amber-800 text-[11px] mt-0.5" id="barcode-unmatched-msg">
+                      We never invent product details. You can enter the product name and material manually, or continue with visual scanning.
+                    </p>
+                  </div>
+                </div>
+                <button type="button" onclick="openManualCorrectionModal()" class="mt-2 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm">
+                  <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                  <span>Specify Product Details Manually</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= METHOD 4: TEXT DESCRIPTION ================= -->
+          <div id="method-panel-text" class="method-panel hidden space-y-4">
+            <div class="space-y-3">
+              <label for="text-waste-description" class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                Natural Language Waste Description
+              </label>
+              <textarea id="text-waste-description" rows="4" 
+                class="w-full rounded-2xl border border-slate-300 p-4 text-sm text-slate-800 placeholder:text-slate-400 focus:border-eco-500 focus:ring-2 focus:ring-eco-500/20 outline-none transition resize-none" 
+                placeholder="e.g., Clean transparent 500ml plastic water bottle with plastic screw cap and paper label still attached..."></textarea>
+              
+              <div>
+                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-eco-600"></i>
+                  <span>Suggested Description Prompts:</span>
+                </span>
+                <div class="flex flex-wrap gap-1.5">
+                  <button type="button" onclick="setTextExample('I have a transparent plastic water bottle with a blue cap, approximately 500 ml.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-eco-100 text-slate-700 hover:text-eco-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🧴</span> <span>Plastic bottle</span>
+                  </button>
+                  <button type="button" onclick="setTextExample('Dry corrugated cardboard shipping box from delivery, clean with kraft paper texture.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>📦</span> <span>Cardboard box</span>
+                  </button>
+                  <button type="button" onclick="setTextExample('Clean aluminum soda can 330ml, metallic silver and red, uncrushed.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🥫</span> <span>Aluminium can</span>
+                  </button>
+                  <button type="button" onclick="setTextExample('Clear transparent glass pickle jar with metal twist-off lid, empty and washed.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-sky-100 text-slate-700 hover:text-sky-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🍶</span> <span>Glass jar</span>
+                  </button>
+                  <button type="button" onclick="setTextExample('Old electronic device: decommissioned Android phone with cracked screen and charging port.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>📱</span> <span>Old electronic device</span>
+                  </button>
+                  <button type="button" onclick="setTextExample('Used clothes: worn 100% blue cotton denim jeans with torn knee fabric.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-purple-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>👕</span> <span>Used clothes</span>
+                  </button>
+                  <button type="button" onclick="setTextExample('Food waste: raw organic vegetable peelings, apple cores, and spent coffee grounds.')" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 rounded-lg transition border border-slate-200 flex items-center gap-1">
+                    <span>🌱</span> <span>Food waste</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= METHOD 5: MANUAL SELECTION ================= -->
+          <div id="method-panel-manual" class="method-panel hidden space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="manual-material-select" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  Select Material Category <span class="text-rose-500">*</span>
+                </label>
+                <select id="manual-material-select" class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 focus:border-eco-500 focus:ring-2 focus:ring-eco-500/20 outline-none transition bg-white" onchange="onManualCategoryChanged()">
+                  <option value="">-- Choose Category --</option>
+                  <option value="Plastic">🧴 Plastic (PET #1, HDPE #2, Polypropylene)</option>
+                  <option value="Aluminum">🥫 Aluminum & Light Metals (Soda cans, foil)</option>
+                  <option value="Cardboard">📦 Cardboard & Kraft Paperboard</option>
+                  <option value="Glass">🍶 Glass Bottles & Food Jars</option>
+                  <option value="Organic">🌱 Organic Waste (Food scraps, peels, grounds)</option>
+                  <option value="Battery">🔋 Hazardous Batteries & E-Waste</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="manual-condition-select" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  Physical Condition
+                </label>
+                <select id="manual-condition-select" class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 focus:border-eco-500 focus:ring-2 focus:ring-eco-500/20 outline-none transition bg-white">
+                  <option value="Clean & Intact">Clean & Intact</option>
+                  <option value="Crushed / Flattened">Crushed / Flattened</option>
+                  <option value="Dirty / Needs Rinsing">Dirty / Needs Rinsing</option>
+                  <option value="Damaged / Swollen">Damaged / Swollen (Hazard inspection)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="manual-item-details" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Specific Item Name / Notes (Optional)
+              </label>
+              <input type="text" id="manual-item-details" placeholder="e.g. 2L soda bottle, cereal box, AA battery" class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-eco-500 focus:ring-2 focus:ring-eco-500/20 outline-none transition">
+            </div>
+          </div>
+
+          <!-- Shared Snapshot Preview -->
+          <div id="active-item-preview-badge" class="hidden mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <img id="badge-thumbnail" src="" class="w-10 h-10 rounded-lg object-cover bg-slate-200">
+              <div>
+                <div id="badge-title" class="text-xs font-bold text-slate-800">Photo Prepared</div>
+                <div id="badge-subtitle" class="text-[11px] text-slate-600">Ready for multimodal analysis</div>
+              </div>
+            </div>
+            <button type="button" onclick="clearCurrentInput()" class="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Clear input">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
+          </div>
+
+          <!-- Shared Action Bar: Analyze, Clear & Reset -->
+          <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button type="button" onclick="clearCurrentInput()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition border border-slate-200 flex items-center justify-center gap-1.5">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Reset Scanner</span>
+              </button>
+            </div>
             
-            <button id="btn-analyze" onclick="submitAnalysis()" disabled class="w-full sm:w-auto px-8 py-2.5 rounded-xl text-sm font-bold text-white bg-eco-600 hover:bg-eco-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-eco-600/20 transition flex items-center justify-center gap-2">
+            <button id="btn-analyze" onclick="submitUnifiedAnalysis()" disabled class="w-full sm:w-auto px-8 py-3 rounded-xl text-sm font-bold text-white bg-eco-600 hover:bg-eco-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-eco-600/20 transition flex items-center justify-center gap-2">
               <i data-lucide="sparkles" class="w-4 h-4"></i>
               <span id="btn-analyze-text">Analyze Waste Material</span>
             </button>
@@ -235,34 +502,130 @@
           <div id="scan-loading" class="hidden mt-6 p-4 rounded-xl bg-eco-50 border border-eco-200 text-eco-800 flex items-center gap-3">
             <div class="w-5 h-5 border-2 border-eco-600 border-t-transparent rounded-full animate-spin"></div>
             <div class="text-sm">
-              <span class="font-bold">Multimodal AI is analyzing pixels...</span>
-              <span class="block text-xs text-eco-600 mt-0.5">Detecting resin polymer, recyclability streams, and formulation of 3 DIY recipes...</span>
+              <span class="font-bold" id="loading-header">Analyzing Waste Material...</span>
+              <span class="block text-xs text-eco-600 mt-0.5" id="loading-subtext">Evaluating polymer stream, EPA carbon metrics, and 3 Waste-to-Wealth blueprints...</span>
             </div>
+          </div>
+
+          <!-- User Feedback Error Box -->
+          <div id="scanner-error-box" class="hidden mt-4 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-3">
+            <i data-lucide="alert-octagon" class="w-5 h-5 text-rose-600 flex-shrink-0"></i>
+            <span id="scanner-error-text">Please provide an input before analyzing.</span>
+          </div>
+
+          <!-- Smart Clarification Modal / Inline Card -->
+          <div id="clarification-card" class="hidden mt-6 p-6 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 shadow-md">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                <i data-lucide="help-circle" class="w-5 h-5"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Smart AI Clarification</span>
+                  <span class="text-[11px] text-amber-700">Need a bit more detail</span>
+                </div>
+                <h4 id="clarification-question" class="text-base font-bold text-slate-900 mt-1">Is the container hard or flexible?</h4>
+                <p class="text-xs text-slate-600 mt-0.5">Please choose the closest match so EcoTransform AI does not fabricate material composition:</p>
+                
+                <div id="clarification-options" class="mt-4 flex flex-wrap gap-2">
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-amber-200/60 flex items-center justify-between text-xs">
+                  <button type="button" onclick="cancelClarification()" class="text-slate-600 hover:text-slate-800 underline">
+                    Edit Description
+                  </button>
+                  <button type="button" onclick="proceedWithoutClarification()" class="text-amber-800 font-semibold hover:underline">
+                    Proceed with Best Estimate &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 1-Click Fast Presets (Retained for quick testing) -->
+        <div class="mt-8 text-center">
+          <p class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Or test with 1-click sample presets:</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button onclick="loadSamplePreset('plastic')" class="p-2.5 bg-white hover:bg-eco-50 border border-slate-200 rounded-xl transition text-left flex items-center gap-2.5">
+              <span class="text-xl">🧴</span>
+              <div>
+                <div class="font-bold text-xs text-slate-800">PET Bottle</div>
+                <div class="text-[10px] text-slate-600">Plastic #1</div>
+              </div>
+            </button>
+            <button onclick="loadSamplePreset('aluminum')" class="p-2.5 bg-white hover:bg-eco-50 border border-slate-200 rounded-xl transition text-left flex items-center gap-2.5">
+              <span class="text-xl">🥫</span>
+              <div>
+                <div class="font-bold text-xs text-slate-800">Soda Can</div>
+                <div class="text-[10px] text-slate-600">Aluminum</div>
+              </div>
+            </button>
+            <button onclick="loadSamplePreset('cardboard')" class="p-2.5 bg-white hover:bg-eco-50 border border-slate-200 rounded-xl transition text-left flex items-center gap-2.5">
+              <span class="text-xl">📦</span>
+              <div>
+                <div class="font-bold text-xs text-slate-800">Cardboard</div>
+                <div class="text-[10px] text-slate-600">Packaging</div>
+              </div>
+            </button>
+            <button onclick="loadSamplePreset('battery')" class="p-2.5 bg-white hover:bg-rose-50 border border-slate-200 rounded-xl transition text-left flex items-center gap-2.5">
+              <span class="text-xl">🔋</span>
+              <div>
+                <div class="font-bold text-xs text-slate-800">AA Battery</div>
+                <div class="text-[10px] text-rose-600 font-semibold">Hazardous</div>
+              </div>
+            </button>
           </div>
         </div>
 
-        <!-- Camera Modal (WebRTC) -->
-        <div id="camera-modal" class="hidden fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
-          <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl">
-            <div class="p-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                <i data-lucide="camera" class="w-5 h-5 text-eco-600"></i>
-                <span>Live Camera Snap</span>
+        <!-- Manual Product Correction Modal -->
+        <div id="manual-correction-modal" class="hidden fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                <i data-lucide="edit" class="w-4 h-4 text-indigo-600"></i>
+                <span>Specify Product Information</span>
               </h3>
-              <button onclick="closeCameraModal()" class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+              <button type="button" onclick="closeManualCorrectionModal()" class="text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
             </div>
-            <div class="p-4 bg-black flex justify-center">
-              <video id="camera-feed" autoplay playsinline class="max-h-72 w-full object-cover rounded-lg"></video>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <label for="corr-product-name" class="block font-bold text-slate-700 mb-1">Product Name & Brand</label>
+                <input type="text" id="corr-product-name" placeholder="e.g. Sprite 500ml Bottle, Kirkland Almond Milk" class="w-full rounded-xl border border-slate-300 p-2.5 text-slate-800 outline-none focus:border-indigo-500">
+              </div>
+
+              <div>
+                <label for="corr-material-select" class="block font-bold text-slate-700 mb-1">Primary Material Composition</label>
+                <select id="corr-material-select" class="w-full rounded-xl border border-slate-300 p-2.5 text-slate-800 outline-none focus:border-indigo-500 bg-white">
+                  <option value="Polyethylene Terephthalate (PET, #1)">🧴 PET #1 (Clear Beverage Bottles)</option>
+                  <option value="High-Density Polyethylene (HDPE #2)">🧴 HDPE #2 (Milk & Detergent Jugs)</option>
+                  <option value="Aluminum Alloy 3004">🥫 Aluminum (Beverage Cans)</option>
+                  <option value="Corrugated Kraft Paperboard">📦 Cardboard (Shipping Cartons)</option>
+                  <option value="Soda-Lime Silica Glass">🍶 Glass (Jars & Wine Bottles)</option>
+                  <option value="Polypropylene (PP 5)">🥣 PP #5 (Tubs & Bottle Caps)</option>
+                  <option value="Alkaline Battery Chemistry">🔋 Hazardous Battery (Alkaline / Li-ion)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="corr-notes" class="block font-bold text-slate-700 mb-1">Packaging Notes (Optional)</label>
+                <input type="text" id="corr-notes" placeholder="e.g. Plastic cap, paper wrap label" class="w-full rounded-xl border border-slate-300 p-2.5 text-slate-800 outline-none focus:border-indigo-500">
+              </div>
             </div>
-            <div class="p-4 bg-slate-50 flex justify-end gap-3">
-              <button onclick="closeCameraModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg">Cancel</button>
-              <button onclick="captureCameraSnapshot()" class="px-5 py-2 text-sm font-bold text-white bg-eco-600 hover:bg-eco-700 rounded-lg flex items-center gap-2">
-                <i data-lucide="camera" class="w-4 h-4"></i>
-                <span>Capture Photo</span>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button type="button" onclick="closeManualCorrectionModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+              <button type="button" onclick="saveManualCorrection()" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">
+                Save & Link to Scanner
               </button>
             </div>
           </div>
         </div>
+
       </div>
     </section>
 
@@ -278,6 +641,9 @@
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 <span>Scan Another Item</span>
               </button>
+              <span id="res-method-tag" class="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">
+                MULTIMODAL VISION
+              </span>
             </div>
             <h2 id="res-item-name" class="text-3xl font-black text-slate-900 mt-1">Plastic Beverage Bottle</h2>
           </div>
@@ -310,7 +676,17 @@
                 <span class="text-xs uppercase tracking-wider font-bold text-slate-600">Material Composition</span>
                 <p id="res-material" class="text-base font-bold text-slate-900">Polyethylene Terephthalate (PET, #1)</p>
               </div>
-              <div class="mt-3">
+              <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="uppercase tracking-wider font-bold text-slate-600 block text-[10px]">Color</span>
+                  <p id="res-color" class="font-semibold text-slate-800">Clear / Blue</p>
+                </div>
+                <div>
+                  <span class="uppercase tracking-wider font-bold text-slate-600 block text-[10px]">Texture</span>
+                  <p id="res-texture" class="font-semibold text-slate-800">Smooth / Ribbed</p>
+                </div>
+              </div>
+              <div class="mt-2.5">
                 <span class="text-xs uppercase tracking-wider font-bold text-slate-600">Physical Condition</span>
                 <p id="res-condition" class="text-sm text-slate-600">Clean, empty, slightly crushed</p>
               </div>
@@ -349,6 +725,172 @@
                   Rinse, crush to minimize bin footprint, replace cap, and place into dry recyclables.
                 </p>
               </div>
+            </div>
+
+            <!-- ================= UNIFIED EVIDENCE FUSION & CONFLICT RESOLUTION ================= -->
+            <div id="fusion-section-card" class="hidden bg-slate-900 text-white p-6 rounded-2xl shadow-lg border border-slate-700/60 space-y-4">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center border border-teal-500/30">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-black tracking-wide uppercase text-white flex items-center gap-2">
+                      <span>Multimodal Intelligence Consensus</span>
+                      <span id="fusion-sources-count" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/40">2 Sources</span>
+                    </h3>
+                    <p id="fusion-confidence-basis" class="text-[11px] text-slate-400">Fused evidence across all available input streams</p>
+                  </div>
+                </div>
+
+                <span id="fusion-confidence-badge" class="px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                  High Confidence
+                </span>
+              </div>
+
+              <!-- Source Conflict Alert (Visible only when conflicts exist) -->
+              <div id="fusion-conflict-alert" class="hidden p-4 rounded-xl bg-amber-950/70 border border-amber-500/50 text-amber-200 space-y-2">
+                <div class="flex items-center gap-2 font-bold text-sm text-amber-300">
+                  <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+                  <span>Source Disagreement Detected</span>
+                </div>
+                <div id="fusion-conflict-list" class="text-xs space-y-1.5 text-amber-100/90">
+                  <!-- Injected via JavaScript -->
+                </div>
+              </div>
+
+              <!-- Supporting Evidence Breakdown -->
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Supporting Evidence Breakdown</h4>
+                <div id="fusion-evidence-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Confirmation Alert Prompt when uncertainty/conflict needs user verification -->
+              <div id="fusion-confirm-box" class="hidden p-3.5 bg-sky-950/60 rounded-xl border border-sky-500/40 flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2 text-xs text-sky-200">
+                  <i data-lucide="help-circle" class="w-4 h-4 text-sky-400 flex-shrink-0"></i>
+                  <span>Please confirm the exact material stream on your product packaging.</span>
+                </div>
+                <button type="button" onclick="document.getElementById('manual-correction-modal').classList.remove('hidden')" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white transition">
+                  Verify / Correct
+                </button>
+              </div>
+            </div>
+
+            <!-- ================= WHAT WE READ (OCR & PACKAGING EVIDENCE) ================= -->
+            <div id="ocr-section-card" class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-slate-700/60 space-y-4">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-eco-500/20 text-eco-400 flex items-center justify-center border border-eco-500/30">
+                    <i data-lucide="scan-text" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-black tracking-wide uppercase text-white flex items-center gap-2">
+                      <span>What We Read</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-eco-500/20 text-eco-300 border border-eco-500/40">OCR Evidence</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400">Directly extracted printed text, molded stamps, & recycling symbols</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <span id="ocr-quality-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                    Image: Sharp
+                  </span>
+                  <span id="ocr-confidence-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-eco-900/60 text-eco-300 border border-eco-700">
+                    94% OCR Confidence
+                  </span>
+                </div>
+              </div>
+
+              <!-- Quality Alert (shows if blurry, dark, or low contrast) -->
+              <div id="ocr-quality-alert" class="hidden p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5"></i>
+                <div class="flex-1">
+                  <span class="font-bold text-amber-300" id="ocr-quality-title">Label blur detected:</span>
+                  <span id="ocr-quality-text" class="block text-amber-200/90 text-[11px] mt-0.5">For highest accuracy, hold camera closer and tap to focus on the printed label.</span>
+                </div>
+              </div>
+
+              <!-- 4-Grid OCR Highlights -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                
+                <!-- 1. Detected Recycling Symbols & Resin Code -->
+                <div class="p-3.5 bg-white/5 rounded-xl border border-white/10 space-y-1.5">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center gap-1">
+                    <i data-lucide="recycle" class="w-3.5 h-3.5 text-eco-400"></i>
+                    <span>Recycling Symbols & Codes</span>
+                  </span>
+                  <div id="ocr-symbols-container" class="flex flex-wrap gap-1.5 pt-1">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-extrabold bg-eco-500/20 text-eco-300 border border-eco-500/30">
+                      ♳ PET 1
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 2. Identified Label Material -->
+                <div class="p-3.5 bg-white/5 rounded-xl border border-white/10 space-y-1">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center gap-1">
+                    <i data-lucide="tag" class="w-3.5 h-3.5 text-sky-400"></i>
+                    <span>Identified Material</span>
+                  </span>
+                  <p id="ocr-identified-material" class="text-sm font-bold text-white pt-1">
+                    Polyethylene Terephthalate (PET, #1)
+                  </p>
+                  <span id="ocr-source" class="text-[10px] text-slate-400 block">
+                    Source: Molded container base stamp
+                  </span>
+                </div>
+
+              </div>
+
+              <!-- Raw Extracted Text -->
+              <div class="p-3.5 bg-black/40 rounded-xl border border-white/10 space-y-1.5">
+                <div class="flex items-center justify-between text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                  <span class="flex items-center gap-1">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    <span>Extracted Packaging Text</span>
+                  </span>
+                  <span class="text-[10px] text-slate-500 font-normal">Optical Character Recognition</span>
+                </div>
+                <div id="ocr-extracted-text" class="font-mono text-xs text-slate-200 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 break-words leading-relaxed max-h-24 overflow-y-auto">
+                  500ml PET 1 RECYCLE ME PLEASE RINSE BEFORE BIN
+                </div>
+              </div>
+
+              <!-- Barcode / QR Registry Evidence (shows when verified code was matched) -->
+              <div id="res-barcode-card" class="hidden p-3.5 bg-indigo-950/50 rounded-xl border border-indigo-500/30 space-y-2 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-indigo-300 flex items-center gap-1.5">
+                    <i data-lucide="barcode" class="w-4 h-4"></i>
+                    <span id="res-barcode-title">Verified Barcode Product</span>
+                  </span>
+                  <span id="res-barcode-num" class="font-mono text-[11px] text-indigo-200 bg-indigo-900/60 px-2 py-0.5 rounded">
+                    5449000000996
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span class="text-slate-400 block">Brand / Manufacturer:</span>
+                    <span id="res-barcode-brand" class="font-bold text-white">The Coca-Cola Company</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block">Packaging Registry:</span>
+                    <span id="res-barcode-registry" class="font-bold text-white">Open Food Facts & GS1 Verified</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Critical Separation Disclaimer -->
+              <div class="pt-2 text-[11px] text-slate-400 flex items-start gap-2 border-t border-white/10">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5"></i>
+                <p class="leading-normal">
+                  <strong class="text-slate-300">Important Notice:</strong> Printed packaging labels may describe only a specific container layer or cap, and do not guarantee the composition of internal components or coatings.
+                </p>
+              </div>
+
             </div>
 
             <!-- Environmental Impact Metric Cards -->

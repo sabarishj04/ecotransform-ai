@@ -13,8 +13,10 @@ from PIL import Image
 import io
 
 import database as db
-from gemini_service import analyze_waste_image
+from gemini_service import analyze_waste_image, analyze_waste_text, check_text_clarification_needed
 from impact_calculator import calculate_environmental_impact
+from barcode_service import lookup_barcode_product, VERIFIED_PRODUCT_CATALOG
+from intelligence_engine import fuse_evidence
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 6MB limit
@@ -49,12 +51,53 @@ def health_check():
         "gemini_configured": bool(os.environ.get("GEMINI_API_KEY"))
     })
 
+@app.route("/api/barcode/lookup", methods=["POST", "OPTIONS"])
+def barcode_lookup():
+    """
+    Looks up Barcode (EAN-13, UPC, Code-128) or QR code in verified product registry.
+    Returns manufacturer, verified product name, material composition, and packaging stream.
+    """
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    data = request.get_json(silent=True) or {}
+    barcode_code = str(data.get("barcode", "")).strip()
+
+    if not barcode_code:
+        return jsonify({
+            "error_code": "EMPTY_BARCODE",
+            "message": "Please provide a barcode or QR code number."
+        }), 400
+
+    result = lookup_barcode_product(barcode_code)
+    return jsonify(result), 200
+
+@app.route("/api/barcode/samples", methods=["GET"])
+def barcode_samples():
+    """Returns verified sample barcodes for 1-click evaluation."""
+    samples = []
+    for code, item in VERIFIED_PRODUCT_CATALOG.items():
+        samples.append({
+            "barcode": code,
+            "product_name": item["product_name"],
+            "barcode_type": item["barcode_type"],
+            "manufacturer": item["manufacturer"],
+            "material": item["packaging"]["primary_material"]
+        })
+    return jsonify({"samples": samples}), 200
+
 @app.route("/api/analyze", methods=["POST", "OPTIONS"])
 def analyze():
     """
     Core AI Analysis Endpoint:
-    Accepts multipart/form-data or JSON (base64 image), performs multimodal vision
-    material identification, classifies streams, and generates 3 upcycle recipes.
+    Accepts 4 identification methods:
+    1. Camera (base64 image or multipart)
+    2. Image Upload (multipart file or base64)
+    3. Text Description (natural language)
+    4. Manual Selection (known waste category + optional condition)
+    
+    Routes through live Gemini model or robust offline materials engine,
+    calculates EPA lifecycle impacts, and stores in database.
     """
     if request.method == "OPTIONS":
         return jsonify({}), 200
@@ -64,29 +107,166 @@ def analyze():
     image_bytes = None
     image_preview_b64 = ""
     filename = "upload.jpg"
+    input_method = "image_upload"
 
-    # Check multipart file upload
+    # 1 & 2: Check multipart file upload
     if "image" in request.files:
         file = request.files["image"]
         if file.filename != "":
             filename = secure_filename(file.filename)
             image_bytes = file.read()
+            input_method = request.form.get("input_method", "image_upload")
     
-    # Or check raw JSON base64 upload
-    elif request.is_json and "image_b64" in request.json:
-        data = request.json["image_b64"]
-        if "," in data:
-            data = data.split(",", 1)[1]
-        try:
-            image_bytes = base64.b64decode(data)
-            filename = request.json.get("filename", "camera_capture.jpg")
-        except Exception:
-            return jsonify({"error": "Invalid base64 image data"}), 400
+    # Check JSON body (Base64 image, text description, or manual category selection)
+    elif request.is_json:
+        data = request.json
+        input_method = data.get("input_method", "image_upload")
+        scanned_barcode = data.get("barcode", "").strip()
+        manual_correction = data.get("manual_correction")
+        
+        # Method 1 & 2: Base64 image
+        if "image_b64" in data and data["image_b64"]:
+            raw_b64 = data["image_b64"]
+            if "," in raw_b64:
+                raw_b64 = raw_b64.split(",", 1)[1]
+            try:
+                image_bytes = base64.b64decode(raw_b64)
+                filename = data.get("filename", "camera_capture.jpg" if input_method == "camera" else "upload.jpg")
+            except Exception:
+                return jsonify({"error": "Invalid base64 image data"}), 400
 
-    if not image_bytes or len(image_bytes) < 20:
+        # Method: Direct Barcode / QR Code identification
+        elif input_method == "barcode_scan" or scanned_barcode:
+            barcode_res = lookup_barcode_product(scanned_barcode)
+
+            # If manual correction provided by user
+            if manual_correction:
+                product_name = manual_correction.get("product_name") or barcode_res.get("product_name") or f"Product #{scanned_barcode}"
+                primary_material = manual_correction.get("material") or "Recyclable Polymer Composite"
+            elif barcode_res.get("found") and barcode_res.get("verified"):
+                product_name = barcode_res["product_name"]
+                primary_material = barcode_res["packaging"]["primary_material"]
+            else:
+                product_name = f"Unregistered Product #{scanned_barcode}"
+                primary_material = "Unknown Packaging Polymer"
+
+            analysis_result = analyze_waste_text(
+                description=product_name,
+                material_hint=primary_material
+            )
+            barcode_evidence = {
+                "barcode": scanned_barcode,
+                "found": barcode_res.get("found", False),
+                "verified": barcode_res.get("verified", False),
+                "product_name": barcode_res.get("product_name"),
+                "brand_owner": barcode_res.get("brand_owner"),
+                "manufacturer": barcode_res.get("manufacturer"),
+                "barcode_type": barcode_res.get("barcode_type"),
+                "source": barcode_res.get("source"),
+                "message": barcode_res.get("message"),
+                "packaging": barcode_res.get("packaging"),
+                "manual_correction_applied": bool(manual_correction)
+            }
+            analysis_result["barcode_evidence"] = barcode_evidence
+
+            # Fuse evidence through intelligence engine
+            fusion = fuse_evidence(
+                barcode_result=barcode_res,
+                text_result=analysis_result if manual_correction else None,
+            )
+
+            id_method = "VERIFIED BARCODE / QR" if (barcode_res.get("verified") or manual_correction) else fusion.get("identification_method", "BARCODE / QR")
+            analysis_result["identification_method"] = id_method
+            saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
+            saved_record["input_method"] = "barcode_scan"
+            saved_record["identification_method"] = id_method
+            saved_record["barcode_evidence"] = barcode_evidence
+            saved_record["evidence_fusion"] = fusion
+            return jsonify(saved_record), 200
+
+        # Method 3: Text Description
+        elif input_method == "text_description" or ("description" in data and not image_bytes):
+            description = data.get("description", "").strip()
+            material_hint = data.get("material_category", "").strip()
+            clarification_answer = data.get("clarification_answer", "").strip()
+            bypass_clarification = data.get("bypass_clarification", False)
+
+            if not description:
+                return jsonify({
+                    "error_code": "EMPTY_DESCRIPTION",
+                    "message": "Please enter a description of the waste item."
+                }), 400
+
+            # Smart Clarification Engine
+            if not bypass_clarification and not clarification_answer:
+                clarification = check_text_clarification_needed(description)
+                if clarification.get("needs_clarification"):
+                    return jsonify({
+                        "status": "needs_clarification",
+                        "question": clarification["question"],
+                        "options": clarification["options"],
+                        "clarification_key": clarification["clarification_key"],
+                        "original_description": description
+                    }), 200
+
+            analysis_result = analyze_waste_text(
+                description,
+                material_hint=material_hint,
+                clarification_answer=clarification_answer
+            )
+
+            manual_sig = {"material_category": material_hint} if material_hint else None
+            fusion = fuse_evidence(text_result=analysis_result, manual_result=manual_sig)
+
+            saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
+            saved_record["input_method"] = "text_description"
+            saved_record["identification_method"] = fusion.get("identification_method", "TEXT-BASED AI")
+            saved_record["evidence_fusion"] = fusion
+            return jsonify(saved_record), 200
+
+        # Method 4: Manual Material Selection
+        elif input_method == "manual_selection" or ("material_category" in data and not image_bytes):
+            material_category = data.get("material_category", "").strip()
+            item_details = data.get("item_details", "").strip()
+            if not material_category:
+                return jsonify({
+                    "error_code": "EMPTY_CATEGORY",
+                    "message": "Please select a material category from the list."
+                }), 400
+
+            desc = f"{item_details} ({material_category})" if item_details else material_category
+            analysis_result = analyze_waste_text(desc, material_hint=material_category)
+            manual_sig = {"material_category": material_category, "item_details": item_details}
+            fusion = fuse_evidence(text_result=analysis_result, manual_result=manual_sig)
+
+            saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
+            saved_record["input_method"] = "manual_selection"
+            saved_record["identification_method"] = fusion.get("identification_method", "MANUAL SELECTION")
+            saved_record["evidence_fusion"] = fusion
+            return jsonify(saved_record), 200
+
+    # Also check if text / manual came through form-data
+    if not image_bytes:
+        form_method = request.form.get("input_method")
+        if form_method == "text_description" and request.form.get("description"):
+            desc = request.form.get("description").strip()
+            hint = request.form.get("material_category", "").strip()
+            analysis_result = analyze_waste_text(desc, material_hint=hint)
+            saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
+            saved_record["input_method"] = "text_description"
+            return jsonify(saved_record), 200
+        elif form_method == "manual_selection" and request.form.get("material_category"):
+            category = request.form.get("material_category").strip()
+            details = request.form.get("item_details", "").strip()
+            desc = f"{details} ({category})" if details else category
+            analysis_result = analyze_waste_text(desc, material_hint=category)
+            saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
+            saved_record["input_method"] = "manual_selection"
+            return jsonify(saved_record), 200
+
         return jsonify({
-            "error_code": "NO_IMAGE_PROVIDED",
-            "message": "Please select or capture a waste image to analyze."
+            "error_code": "NO_INPUT_PROVIDED",
+            "message": "Please capture an image, upload a file, describe the item, or select a category."
         }), 400
 
     # Process and compress image thumbnail for quick preview in history
@@ -103,8 +283,18 @@ def analyze():
     # Execute Multimodal AI Analysis
     analysis_result = analyze_waste_image(image_bytes, filename=filename)
 
+    # Fuse evidence across Visual AI and embedded OCR
+    ocr_evidence = analysis_result.get("ocr_evidence")
+    fusion = fuse_evidence(
+        visual_result=analysis_result,
+        ocr_result=ocr_evidence
+    )
+    analysis_result["evidence_fusion"] = fusion
+
     # Persist in SQLite database
     saved_record = db.save_scan_result(session_id, analysis_result, image_preview_b64)
+    saved_record["input_method"] = input_method
+    saved_record["evidence_fusion"] = fusion
 
     return jsonify(saved_record), 200
 

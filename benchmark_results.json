@@ -1,0 +1,1119 @@
+{
+  "summary": {
+    "timestamp": "2026-11-24T10:47:14.896171",
+    "total_cases": 120,
+    "tested_cases": 120,
+    "correct_predictions": 120,
+    "overall_accuracy_pct": 100.0,
+    "avg_latency_sec": 0.7,
+    "hazardous_safety_recall_pct": 100.0,
+    "per_category": {
+      "plastic": {
+        "total": 20,
+        "correct": 20
+      },
+      "aluminum": {
+        "total": 20,
+        "correct": 20
+      },
+      "glass": {
+        "total": 20,
+        "correct": 20
+      },
+      "cardboard": {
+        "total": 20,
+        "correct": 20
+      },
+      "organic": {
+        "total": 20,
+        "correct": 20
+      },
+      "battery": {
+        "total": 20,
+        "correct": 20
+      }
+    }
+  },
+  "results": [
+    {
+      "id": 1,
+      "filename": "plastic_sample_01.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 1.07,
+      "correct": true
+    },
+    {
+      "id": 2,
+      "filename": "plastic_sample_02.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 3,
+      "filename": "plastic_sample_03.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 4,
+      "filename": "plastic_sample_04.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.74,
+      "correct": true
+    },
+    {
+      "id": 5,
+      "filename": "plastic_sample_05.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 6,
+      "filename": "plastic_sample_06.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.54,
+      "correct": true
+    },
+    {
+      "id": 7,
+      "filename": "plastic_sample_07.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.92,
+      "correct": true
+    },
+    {
+      "id": 8,
+      "filename": "plastic_sample_08.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 9,
+      "filename": "plastic_sample_09.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 10,
+      "filename": "plastic_sample_10.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 11,
+      "filename": "plastic_sample_11.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 12,
+      "filename": "plastic_sample_12.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 13,
+      "filename": "plastic_sample_13.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 14,
+      "filename": "plastic_sample_14.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 15,
+      "filename": "plastic_sample_15.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 16,
+      "filename": "plastic_sample_16.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 1.03,
+      "correct": true
+    },
+    {
+      "id": 17,
+      "filename": "plastic_sample_17.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 18,
+      "filename": "plastic_sample_18.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 19,
+      "filename": "plastic_sample_19.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.54,
+      "correct": true
+    },
+    {
+      "id": 20,
+      "filename": "plastic_sample_20.jpg",
+      "ground_truth": "plastic",
+      "predicted": "mixed recyclable plastics & bottles (pet/hdpe) / polyethylene terephthalate (pet #1) & hdpe #2",
+      "confidence": 0.94,
+      "latency": 0.61,
+      "correct": true
+    },
+    {
+      "id": 21,
+      "filename": "aluminum_sample_01.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 22,
+      "filename": "aluminum_sample_02.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.55,
+      "correct": true
+    },
+    {
+      "id": 23,
+      "filename": "aluminum_sample_03.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.71,
+      "correct": true
+    },
+    {
+      "id": 24,
+      "filename": "aluminum_sample_04.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 25,
+      "filename": "aluminum_sample_05.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.53,
+      "correct": true
+    },
+    {
+      "id": 26,
+      "filename": "aluminum_sample_06.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 27,
+      "filename": "aluminum_sample_07.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 28,
+      "filename": "aluminum_sample_08.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 29,
+      "filename": "aluminum_sample_09.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 30,
+      "filename": "aluminum_sample_10.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.54,
+      "correct": true
+    },
+    {
+      "id": 31,
+      "filename": "aluminum_sample_11.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.61,
+      "correct": true
+    },
+    {
+      "id": 32,
+      "filename": "aluminum_sample_12.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 33,
+      "filename": "aluminum_sample_13.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 34,
+      "filename": "aluminum_sample_14.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.82,
+      "correct": true
+    },
+    {
+      "id": 35,
+      "filename": "aluminum_sample_15.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 1.25,
+      "correct": true
+    },
+    {
+      "id": 36,
+      "filename": "aluminum_sample_16.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 37,
+      "filename": "aluminum_sample_17.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 38,
+      "filename": "aluminum_sample_18.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.64,
+      "correct": true
+    },
+    {
+      "id": 39,
+      "filename": "aluminum_sample_19.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 40,
+      "filename": "aluminum_sample_20.jpg",
+      "ground_truth": "aluminum",
+      "predicted": "aluminum beverage can (330ml) / aluminum alloy 3004",
+      "confidence": 0.96,
+      "latency": 1.13,
+      "correct": true
+    },
+    {
+      "id": 41,
+      "filename": "glass_sample_01.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 42,
+      "filename": "glass_sample_02.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 43,
+      "filename": "glass_sample_03.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 1.13,
+      "correct": true
+    },
+    {
+      "id": 44,
+      "filename": "glass_sample_04.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.65,
+      "correct": true
+    },
+    {
+      "id": 45,
+      "filename": "glass_sample_05.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.91,
+      "correct": true
+    },
+    {
+      "id": 46,
+      "filename": "glass_sample_06.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 47,
+      "filename": "glass_sample_07.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 48,
+      "filename": "glass_sample_08.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 49,
+      "filename": "glass_sample_09.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.84,
+      "correct": true
+    },
+    {
+      "id": 50,
+      "filename": "glass_sample_10.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 1.02,
+      "correct": true
+    },
+    {
+      "id": 51,
+      "filename": "glass_sample_11.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 52,
+      "filename": "glass_sample_12.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 53,
+      "filename": "glass_sample_13.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 54,
+      "filename": "glass_sample_14.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 55,
+      "filename": "glass_sample_15.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 56,
+      "filename": "glass_sample_16.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 57,
+      "filename": "glass_sample_17.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 1.14,
+      "correct": true
+    },
+    {
+      "id": 58,
+      "filename": "glass_sample_18.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 59,
+      "filename": "glass_sample_19.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 60,
+      "filename": "glass_sample_20.jpg",
+      "ground_truth": "glass",
+      "predicted": "glass bottle or jar / soda-lime silica glass",
+      "confidence": 0.9,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 61,
+      "filename": "cardboard_sample_01.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 62,
+      "filename": "cardboard_sample_02.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 63,
+      "filename": "cardboard_sample_03.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 64,
+      "filename": "cardboard_sample_04.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 65,
+      "filename": "cardboard_sample_05.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 66,
+      "filename": "cardboard_sample_06.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 67,
+      "filename": "cardboard_sample_07.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 68,
+      "filename": "cardboard_sample_08.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.53,
+      "correct": true
+    },
+    {
+      "id": 69,
+      "filename": "cardboard_sample_09.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.51,
+      "correct": true
+    },
+    {
+      "id": 70,
+      "filename": "cardboard_sample_10.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.53,
+      "correct": true
+    },
+    {
+      "id": 71,
+      "filename": "cardboard_sample_11.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.61,
+      "correct": true
+    },
+    {
+      "id": 72,
+      "filename": "cardboard_sample_12.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 73,
+      "filename": "cardboard_sample_13.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 74,
+      "filename": "cardboard_sample_14.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 75,
+      "filename": "cardboard_sample_15.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 76,
+      "filename": "cardboard_sample_16.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.82,
+      "correct": true
+    },
+    {
+      "id": 77,
+      "filename": "cardboard_sample_17.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 78,
+      "filename": "cardboard_sample_18.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.84,
+      "correct": true
+    },
+    {
+      "id": 79,
+      "filename": "cardboard_sample_19.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 80,
+      "filename": "cardboard_sample_20.jpg",
+      "ground_truth": "cardboard",
+      "predicted": "corrugated cardboard packaging box / corrugated kraft paperboard",
+      "confidence": 0.95,
+      "latency": 0.93,
+      "correct": true
+    },
+    {
+      "id": 81,
+      "filename": "organic_sample_01.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.92,
+      "correct": true
+    },
+    {
+      "id": 82,
+      "filename": "organic_sample_02.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 1.04,
+      "correct": true
+    },
+    {
+      "id": 83,
+      "filename": "organic_sample_03.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 84,
+      "filename": "organic_sample_04.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 85,
+      "filename": "organic_sample_05.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 86,
+      "filename": "organic_sample_06.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 87,
+      "filename": "organic_sample_07.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 88,
+      "filename": "organic_sample_08.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 89,
+      "filename": "organic_sample_09.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 90,
+      "filename": "organic_sample_10.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.83,
+      "correct": true
+    },
+    {
+      "id": 91,
+      "filename": "organic_sample_11.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 92,
+      "filename": "organic_sample_12.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 93,
+      "filename": "organic_sample_13.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.53,
+      "correct": true
+    },
+    {
+      "id": 94,
+      "filename": "organic_sample_14.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 95,
+      "filename": "organic_sample_15.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.93,
+      "correct": true
+    },
+    {
+      "id": 96,
+      "filename": "organic_sample_16.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.74,
+      "correct": true
+    },
+    {
+      "id": 97,
+      "filename": "organic_sample_17.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.71,
+      "correct": true
+    },
+    {
+      "id": 98,
+      "filename": "organic_sample_18.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 99,
+      "filename": "organic_sample_19.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 100,
+      "filename": "organic_sample_20.jpg",
+      "ground_truth": "organic",
+      "predicted": "organic food waste & kitchen scraps / biodegradable organic matter",
+      "confidence": 0.88,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 101,
+      "filename": "battery_sample_01.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.93,
+      "correct": true
+    },
+    {
+      "id": 102,
+      "filename": "battery_sample_02.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.54,
+      "correct": true
+    },
+    {
+      "id": 103,
+      "filename": "battery_sample_03.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.61,
+      "correct": true
+    },
+    {
+      "id": 104,
+      "filename": "battery_sample_04.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 105,
+      "filename": "battery_sample_05.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 106,
+      "filename": "battery_sample_06.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 107,
+      "filename": "battery_sample_07.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.62,
+      "correct": true
+    },
+    {
+      "id": 108,
+      "filename": "battery_sample_08.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 109,
+      "filename": "battery_sample_09.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 110,
+      "filename": "battery_sample_10.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.72,
+      "correct": true
+    },
+    {
+      "id": 111,
+      "filename": "battery_sample_11.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.52,
+      "correct": true
+    },
+    {
+      "id": 112,
+      "filename": "battery_sample_12.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 1.14,
+      "correct": true
+    },
+    {
+      "id": 113,
+      "filename": "battery_sample_13.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.51,
+      "correct": true
+    },
+    {
+      "id": 114,
+      "filename": "battery_sample_14.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 115,
+      "filename": "battery_sample_15.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.63,
+      "correct": true
+    },
+    {
+      "id": 116,
+      "filename": "battery_sample_16.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 117,
+      "filename": "battery_sample_17.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 1.13,
+      "correct": true
+    },
+    {
+      "id": 118,
+      "filename": "battery_sample_18.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.73,
+      "correct": true
+    },
+    {
+      "id": 119,
+      "filename": "battery_sample_19.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 1.24,
+      "correct": true
+    },
+    {
+      "id": 120,
+      "filename": "battery_sample_20.jpg",
+      "ground_truth": "battery",
+      "predicted": "alkaline / lithium battery (aa) / heavy metal & zinc-manganese dioxide / lithium",
+      "confidence": 0.92,
+      "latency": 0.63,
+      "correct": true
+    }
+  ]
+}

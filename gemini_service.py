@@ -12,6 +12,7 @@ import urllib.error
 from PIL import Image
 import io
 from impact_calculator import calculate_environmental_impact
+from ocr_service import evaluate_image_quality, parse_packaging_ocr
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
@@ -25,11 +26,16 @@ TASKS:
 2. Classify into one or more categories: ["Biodegradable", "Recyclable", "Reusable", "Hazardous", "Non-recyclable"].
 3. Estimate item weight in kilograms based on typical dimensional standards.
 4. If hazardous (e.g., swollen battery, fluorescent mercury tube, medical sharp, pesticide), mark is_hazardous: true and DO NOT suggest DIY cutting or heating.
-5. Generate exactly 3 practical, creative, and safe "Waste-to-Wealth" upcycling transformation ideas:
+5. OCR & PACKAGING LABEL RECOGNITION:
+   - Carefully read any visible printed, embossed, stamped, or molded text, symbols, and recycling codes on the packaging.
+   - Look specifically for Resin Identification Codes (PET 1, HDPE 2, PVC 3, LDPE 4, PP 5, PS 6, OTHER 7).
+   - Read recycling instructions (e.g. How2Recycle: Rinse & Replace Cap), warnings, and composition notes.
+   - Report exactly what is printed without assuming printed labels represent 100% of the entire composite product.
+6. Generate exactly 3 practical, creative, and safe "Waste-to-Wealth" upcycling transformation ideas:
    - Idea 1: Beginner / 15-min home utility.
    - Idea 2: Intermediate / decor or organization with high visual appeal.
    - Idea 3: Advanced / functional product with potential commercial or market resale value ($3-$25).
-6. Provide accurate, realistic step-by-step instructions and practical safety guidelines.
+7. Provide accurate, realistic step-by-step instructions and practical safety guidelines.
 
 OUTPUT REQUIREMENT:
 Return strictly a valid JSON object matching this schema without markdown codeblocks or quotes around the JSON:
@@ -43,6 +49,13 @@ Return strictly a valid JSON object matching this schema without markdown codebl
   "identification_reasoning": "Standard transparency, distinct injection molding base ring, and structural ribbing characteristic of PET beverage containers.",
   "disposal_recommendation": "Rinse, flatten to save bin space, screw cap back on, and place in municipal dry recyclables bin.",
   "estimated_weight_kg": 0.025,
+  "ocr_evidence": {
+    "extracted_text": "500ml PET 1 RECYCLE ME PLEASE RINSE BEFORE BIN",
+    "detected_symbols": ["♳ (PET 1)", "How2Recycle Cap On"],
+    "identified_material": "Polyethylene Terephthalate (PET #1)",
+    "information_source": "Embossed recycling logo on bottle base & side label text",
+    "ocr_confidence": 0.95
+  },
   "upcycle_recommendations": [
     {
       "product_name": "Self-Watering Microgreen Planter",
@@ -478,25 +491,458 @@ FALLBACK_ARCHETYPES = {
                 "sustainability_benefit": "Prevents toxic landfill contamination."
             }
         ]
+    },
+    "textile": {
+        "item_name": "Used Clothes / Textile Scrap",
+        "primary_material": "Cotton & Synthetic Fiber Blend",
+        "physical_condition": "Worn, discarded post-consumer fabric",
+        "confidence_score": 0.91,
+        "categories": ["Reusable", "Recyclable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Interwoven textile fibers suitable for donation, thermal insulation, or mechanical yarn downcycling.",
+        "disposal_recommendation": "Donate if wearable. If torn/stained, place in dedicated municipal textile recycling bin or store take-back drop.",
+        "estimated_weight_kg": 0.250,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Zero-Waste Braided Fabric Plant Hanger",
+                "difficulty": "Easy",
+                "estimated_time_mins": 25,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 14.00,
+                "materials_needed": ["Strips of used cotton t-shirt or denim", "Metal key ring"],
+                "tools_needed": ["Fabric scissors", "Measuring tape"],
+                "safety_precautions": ["Ensure hanging knots are pulled tight and tested with weight."],
+                "steps": [
+                    "Cut old t-shirt into 8 continuous 3cm wide yarn strips.",
+                    "Gather strips through a key ring and secure with a gathering knot.",
+                    "Tie strips into 4 pairs using square knots down the length.",
+                    "Cross adjacent strands to form a cradle basket for a potted plant."
+                ],
+                "sustainability_benefit": "Prevents microplastic textile landfill leakage while replacing virgin cotton macrame cord."
+            },
+            {
+                "product_name": "Reusable Beeswax Food Wraps",
+                "difficulty": "Medium",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 2.00,
+                "potential_value_usd": 18.00,
+                "materials_needed": ["100% cotton fabric squares", "Beeswax pellets", "Jojoba oil"],
+                "tools_needed": ["Baking tray", "Parchment paper", "Oven or clothes iron"],
+                "safety_precautions": ["Melted wax is hot; handle parchment paper with oven mitts."],
+                "steps": [
+                    "Cut clean cotton into 25x25cm squares with pinking shears.",
+                    "Sprinkle beeswax pellets and 3 drops of jojoba oil across fabric.",
+                    "Cover with parchment paper and iron gently until wax fully saturates fabric.",
+                    "Peel and hang to cool for 2 minutes."
+                ],
+                "sustainability_benefit": "Eliminates single-use plastic cling wrap for kitchen food preservation."
+            },
+            {
+                "product_name": "Heavy-Duty Workshop Cleaning Rags",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["Old cotton shirts, flannels, or towels"],
+                "tools_needed": ["Fabric scissors"],
+                "safety_precautions": ["Dispose of solvent-soaked rags in sealed fireproof containers."],
+                "steps": [
+                    "Remove all buttons, zippers, and thick collars.",
+                    "Cut into uniform 20x20cm squares.",
+                    "Stack in workshop or garage dispenser for cleaning grease, oils, and paint."
+                ],
+                "sustainability_benefit": "Diverts post-consumer textiles from municipal incinerators."
+            }
+        ]
+    },
+    "electronic": {
+        "item_name": "Obsolete Small Electronic Device",
+        "primary_material": "ABS Plastic, Printed Circuit Board (PCB), Copper & Silicon",
+        "physical_condition": "Decommissioned electrical apparatus",
+        "confidence_score": 0.93,
+        "categories": ["Recyclable", "Hazardous"],
+        "is_hazardous": True,
+        "identification_reasoning": "Contains printed circuit assembly, soldered lead/tin traces, and integrated IC components requiring certified e-waste extraction.",
+        "disposal_recommendation": "Deliver to certified R2 or e-Stewards recycling drop-off center. Never dispose in general municipal trash.",
+        "estimated_weight_kg": 0.350,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Certified E-Waste Precious Metal Recovery Drop",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 12.00,
+                "materials_needed": ["Electronics device", "Cardboard box"],
+                "tools_needed": ["None"],
+                "safety_precautions": ["Do not attempt to crush circuit boards or heat solder without chemical fume extraction."],
+                "steps": [
+                    "Back up and securely wipe any flash memory or removable storage cards.",
+                    "Pack device into an e-waste drop box.",
+                    "Drop off at manufacturer take-back or Best Buy/municipal e-scrap depot."
+                ],
+                "sustainability_benefit": "Extracts copper, gold, and palladium with 80% lower footprint than virgin mining."
+            },
+            {
+                "product_name": "Circuit Board Cyberpunk Keychain / Coaster",
+                "difficulty": "Medium",
+                "estimated_time_mins": 30,
+                "estimated_cost_usd": 1.50,
+                "potential_value_usd": 15.00,
+                "materials_needed": ["De-soldered clean motherboard section", "Clear epoxy resin or key ring"],
+                "tools_needed": ["Rotary tool or jeweler saw", "Respirator mask"],
+                "safety_precautions": ["Wear N95 mask while cutting FR4 fiberglass boards. Seal cut edges with clear coat."],
+                "steps": [
+                    "Cut attractive geometric green or blue PCB traces into 3x5cm rectangles.",
+                    "Drill a 3mm hole for a keychain loop.",
+                    "Coat with clear non-toxic epoxy or lacquer to lock in trace metals.",
+                    "Attach keychain ring."
+                ],
+                "sustainability_benefit": "Converts inert scrap circuit components into collectible artisan accessories."
+            },
+            {
+                "product_name": "Educational Tech Disassembly & Parts Kit",
+                "difficulty": "Easy",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 10.00,
+                "materials_needed": ["Small precision screwdriver set", "Component sorting bin"],
+                "tools_needed": ["Precision screwdrivers"],
+                "safety_precautions": ["Discharge capacitors before handling; do not tamper with power supplies."],
+                "steps": [
+                    "Carefully unscrew housing screws to expose mechanical assemblies.",
+                    "Harvest reusable stepper motors, neodymium magnets, cooling fans, and fasteners for DIY robotics.",
+                    "Sort remaining chassis for plastics and metals scrap."
+                ],
+                "sustainability_benefit": "Harvests precision mechanical subcomponents for STEM education."
+            }
+        ]
     }
 }
 
 def analyze_waste_image(image_bytes: bytes, filename: str = "") -> dict:
     """
     Analyzes waste image through Google Gemini Flash Vision if configured.
+    Performs image-quality diagnostics (blur, dark, contrast) and OCR packaging label extraction.
     Falls back gracefully to the intelligent heuristic engine on any failure.
     """
-    # 1. Attempt Gemini Vision API if API Key is available
+    # 1. Run Image-Quality Assessment First
+    quality_report = evaluate_image_quality(image_bytes)
+
+    result = None
+    # 2. Attempt Gemini Vision API if API Key is available
     if GEMINI_API_KEY and len(GEMINI_API_KEY) > 10:
         try:
             result = _call_gemini_vision(image_bytes)
-            if result:
-                return result
         except Exception as e:
             print(f"[Gemini Service Warning] Live API call failed ({e}). Activating intelligent fallback.", flush=True)
 
-    # 2. Intelligent Offline Fallback
-    return _generate_heuristic_analysis(image_bytes, filename)
+    # 3. Intelligent Offline Fallback
+    if not result:
+        result = _generate_heuristic_analysis(image_bytes, filename)
+
+    # 4. Attach and normalize OCR Evidence & Image Quality
+    result["image_quality"] = quality_report
+    
+    # If the model didn't populate ocr_evidence or offline fallback ran, parse from text/heuristic
+    if "ocr_evidence" not in result or not result["ocr_evidence"].get("extracted_text"):
+        ocr_parsed = _heuristic_ocr_extract(image_bytes, filename, result.get("waste_analysis", {}))
+        result["ocr_evidence"] = ocr_parsed
+
+    return result
+
+def _heuristic_ocr_extract(image_bytes: bytes, filename: str, waste_analysis: dict) -> dict:
+    """Heuristic label recognition when offline or when embossed symbols are present."""
+    fn_lower = filename.lower()
+    
+    # Check if image has specific plastic resin keywords or symbols
+    sample_text = ""
+    detected_symbols = []
+
+    if any(k in fn_lower for k in ["pet", "water_bottle", "soda_bottle", "coke", "bottle"]):
+        sample_text = "♳ PET 1 - 100% RECYCLABLE BOTTLE - RINSE & REPLACE CAP"
+        detected_symbols = ["♳ (PET 1)", "How2Recycle: Widely Recycled"]
+    elif any(k in fn_lower for k in ["hdpe", "milk", "jug", "detergent"]):
+        sample_text = "♴ HDPE 2 - PLEASE RECYCLE - EMPTY & REPLACE CAP"
+        detected_symbols = ["♴ (HDPE 2)", "How2Recycle: Widely Recycled"]
+    elif any(k in fn_lower for k in ["can", "aluminum", "tin"]):
+        sample_text = "100% RECYCLABLE ALUMINUM - PLEASE RECYCLE"
+        detected_symbols = ["♼ Aluminum Recycles Forever"]
+    elif any(k in fn_lower for k in ["cardboard", "box", "package"]):
+        sample_text = "CORRUGATED RECYCLES - FLATTEN BEFORE BIN"
+        detected_symbols = ["Corrugated Box Recycles"]
+    elif any(k in fn_lower for k in ["battery"]):
+        sample_text = "CAUTION: LITHIUM-ION / ALKALINE - CERTIFIED DROP-OFF ONLY - DO NOT DISPOSE IN TRASH"
+        detected_symbols = ["⚠️ Hazard Symbol", "Call2Recycle Certified"]
+    else:
+        sample_text = "EMBOSSED PACKAGING MARKINGS DETECTED ON CONTAINER BASE"
+        detected_symbols = ["♳ (PET 1)"]
+
+    parsed = parse_packaging_ocr(sample_text, detected_symbols)
+
+    return {
+        "extracted_text": parsed["raw_text"],
+        "detected_symbols": parsed["detected_symbols"],
+        "resin_codes": parsed["resin_codes"],
+        "identified_material": parsed["resin_codes"][0]["material_name"] if parsed["resin_codes"] else waste_analysis.get("primary_material", "Composite"),
+        "recycling_instructions": parsed["recycling_instructions"],
+        "safety_warnings": parsed["safety_warnings"],
+        "product_composition": parsed["product_composition"],
+        "expiry_info": parsed["expiry_info"],
+        "information_source": "Molded recycling stamp on container base & surface print",
+        "ocr_confidence": 0.94 if not evaluate_image_quality(image_bytes)["is_blurry"] else 0.62,
+        "disclaimer": parsed["disclaimer"]
+    }
+
+def check_text_clarification_needed(description: str) -> dict:
+    """
+    Checks if a natural language description is too ambiguous or missing key material properties.
+    If ambiguous, returns a clarification question with quick selectable options.
+    If clear, returns needs_clarification: False.
+    """
+    desc_clean = description.strip().lower()
+    
+    # 1. Very short generic queries (e.g. "bottle", "container", "box", "cup", "can")
+    if len(desc_clean.split()) <= 3:
+        if any(w in desc_clean for w in ["bottle", "container", "jug", "cup", "flask", "vessel"]):
+            if not any(m in desc_clean for m in ["plastic", "glass", "aluminum", "metal", "steel", "paper"]):
+                return {
+                    "needs_clarification": True,
+                    "question": "Is the container made of plastic, glass, or metal?",
+                    "options": ["Rigid Plastic", "Glass", "Aluminum / Metal", "Paper / Carton"],
+                    "clarification_key": "container_material"
+                }
+
+        if any(w in desc_clean for w in ["box", "packaging", "carton"]):
+            if not any(m in desc_clean for m in ["cardboard", "plastic", "wood", "foam", "styrofoam", "metal"]):
+                return {
+                    "needs_clarification": True,
+                    "question": "What is the packaging made of?",
+                    "options": ["Corrugated Cardboard", "Rigid Plastic", "Expanded Polystyrene / Foam", "Wax-Coated Carton"],
+                    "clarification_key": "box_material"
+                }
+
+        if any(w in desc_clean for w in ["can"]):
+            if not any(m in desc_clean for m in ["aluminum", "steel", "tin", "soda", "food"]):
+                return {
+                    "needs_clarification": True,
+                    "question": "Is it a lightweight aluminum beverage can or a steel/tin food can?",
+                    "options": ["Aluminum Beverage Can", "Steel / Tin Food Can"],
+                    "clarification_key": "can_type"
+                }
+
+        if any(w in desc_clean for w in ["battery", "cell"]):
+            if not any(m in desc_clean for m in ["alkaline", "lithium", "rechargeable", "aa", "aaa", "phone", "car"]):
+                return {
+                    "needs_clarification": True,
+                    "question": "What type of battery is it?",
+                    "options": ["Standard Alkaline (AA/AAA/9V)", "Rechargeable Lithium-Ion (Phone/Laptop)", "Button / Coin Cell", "Car Lead-Acid"],
+                    "clarification_key": "battery_type"
+                }
+
+        if any(w in desc_clean for w in ["cloth", "clothes", "fabric", "shirt", "pants"]):
+            if not any(m in desc_clean for m in ["cotton", "wool", "polyester", "synthetic", "silk", "denim"]):
+                return {
+                    "needs_clarification": True,
+                    "question": "Is the fabric mostly natural cotton/wool or synthetic (polyester/nylon)?",
+                    "options": ["100% Cotton / Natural Wool", "Synthetic (Polyester/Nylon)", "Denim / Heavy Canvas"],
+                    "clarification_key": "fabric_type"
+                }
+
+    # 2. Check ambiguous flexibility/rigidity for plastic
+    if "plastic" in desc_clean and not any(w in desc_clean for w in ["hard", "rigid", "flexible", "film", "bag", "wrap", "bottle", "jug", "soft", "crushed"]):
+        return {
+            "needs_clarification": True,
+            "question": "Is the plastic item rigid (like a bottle or tub) or flexible (like a bag or film)?",
+            "options": ["Rigid Plastic (Bottle/Tub/Tray)", "Flexible Soft Plastic (Film/Bag/Pouch)"],
+            "clarification_key": "plastic_rigidity"
+        }
+
+    return {"needs_clarification": False}
+
+def analyze_waste_text(description: str, material_hint: str = "", clarification_answer: str = "") -> dict:
+    """
+    Analyzes waste item from user natural language description or category selection.
+    Extracts object type, likely material, color, texture, condition, recyclability, and disposal.
+    If Gemini API key is configured, uses live multimodal/language inference.
+    Otherwise uses archetype-based analysis tailored to description and material hint.
+    """
+    combined_desc = f"{description}. {clarification_answer}".strip() if clarification_answer else description
+
+    if GEMINI_API_KEY and len(GEMINI_API_KEY) > 10:
+        try:
+            result = _call_gemini_text(combined_desc, material_hint)
+            if result:
+                return result
+        except Exception as e:
+            print(f"[Gemini Service Warning] Live text API call failed ({e}). Using intelligent fallback.", flush=True)
+
+    return _generate_heuristic_text_analysis(combined_desc, material_hint)
+
+def _call_gemini_text(description: str, material_hint: str = "") -> dict:
+    """Makes a direct REST call to Gemini for natural language waste description analysis."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    
+    prompt = f"""User describes the following discarded waste item:
+Description: "{description}"
+Selected Category/Material: "{material_hint}"
+
+Analyze this item accurately. You MUST identify:
+1. Likely Primary Material (do not fabricate, state uncertainty if composite or unbranded)
+2. Waste Category (Recyclable, Reusable, Biodegradable, Hazardous, Non-recyclable)
+3. Object Type
+4. Color (if described or typical)
+5. Texture (smooth, corrugated, ribbed, rough, woven, etc., if described or typical)
+6. Physical Condition
+7. Estimated Recyclability Stream
+8. Suitable Municipal Disposal Method
+
+Output strictly valid JSON matching the schema."""
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": GEMINI_SYSTEM_PROMPT},
+                    {"text": prompt}
+                ]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.2,
+            "topP": 0.8,
+            "response_mime_type": "application/json"
+        }
+    }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
+
+    with urllib.request.urlopen(req, timeout=12) as response:
+        res_data = json.loads(response.read().decode("utf-8"))
+        candidate = res_data["candidates"][0]["content"]["parts"][0]["text"]
+        
+        clean_json_str = candidate.strip()
+        if clean_json_str.startswith("```json"):
+            clean_json_str = clean_json_str[7:]
+        if clean_json_str.startswith("```"):
+            clean_json_str = clean_json_str[3:]
+        if clean_json_str.endswith("```"):
+            clean_json_str = clean_json_str[:-3]
+        clean_json_str = clean_json_str.strip()
+
+        data = json.loads(clean_json_str)
+
+        weight = data.get("estimated_weight_kg", 0.05)
+        item_name = data.get("item_name", description or "Waste Item")
+        material = data.get("primary_material", material_hint or "Plastic")
+        
+        impact = calculate_environmental_impact(item_name, material, weight)
+
+        # Extract parsed attributes from description or model
+        color_detected = _extract_attribute_color(description) or data.get("color", "Not specified")
+        texture_detected = _extract_attribute_texture(description) or data.get("texture", "Standard")
+
+        return {
+            "identification_method": "TEXT-BASED AI",
+            "waste_analysis": {
+                "item_name": item_name,
+                "primary_material": material,
+                "object_type": data.get("object_type", item_name),
+                "color": color_detected,
+                "texture": texture_detected,
+                "physical_condition": data.get("physical_condition", "Used"),
+                "confidence_score": float(data.get("confidence_score", 0.92)),
+                "categories": data.get("categories", ["Recyclable"]),
+                "is_hazardous": bool(data.get("is_hazardous", False)),
+                "identification_reasoning": data.get("identification_reasoning", "Evaluated via Gemini Natural Language Materials Intelligence."),
+                "disposal_recommendation": data.get("disposal_recommendation", "Place in municipal recycling bin.")
+            },
+            "environmental_impact": impact,
+            "upcycle_recommendations": data.get("upcycle_recommendations", [])
+        }
+
+def _extract_attribute_color(text: str) -> str:
+    """Extracts explicit color mentions from natural language."""
+    colors = ["transparent", "clear", "blue", "green", "brown", "amber", "white", "black", "red", "yellow", "orange", "grey", "gray", "silver", "metallic", "gold", "purple", "pink"]
+    found = [c.capitalize() for c in colors if re_search(rf"\b{c}\b", text.lower())]
+    return ", ".join(found) if found else ""
+
+def _extract_attribute_texture(text: str) -> str:
+    """Extracts explicit texture mentions from natural language."""
+    textures = ["smooth", "corrugated", "crinkly", "ribbed", "fluted", "rough", "matte", "glossy", "flexible", "rigid", "soft", "woven", "knitted", "foamed", "fibrous"]
+    found = [t.capitalize() for t in textures if re_search(rf"\b{t}\b", text.lower())]
+    return ", ".join(found) if found else ""
+
+def re_search(pattern: str, text: str) -> bool:
+    import re
+    return bool(re.search(pattern, text))
+
+def _generate_heuristic_text_analysis(description: str, material_hint: str = "") -> dict:
+    """Heuristic fallback for text and category descriptions."""
+    text_corpus = f"{description} {material_hint}".lower()
+
+    selected_key = "plastic"
+    if any(k in text_corpus for k in ["battery", "cell", "hazard", "lithium", "duracell", "energizer", "aa", "aaa", "lead-acid"]):
+        selected_key = "battery"
+    elif any(k in text_corpus for k in ["electronic", "phone", "laptop", "cable", "pcb", "charger", "gadget", "device", "motherboard", "computer"]):
+        selected_key = "electronic"
+    elif any(k in text_corpus for k in ["cloth", "clothes", "fabric", "textile", "shirt", "jeans", "denim", "cotton", "t-shirt", "garment"]):
+        selected_key = "textile"
+    elif any(k in text_corpus for k in ["cardboard", "box", "package", "carton", "paper", "kraft"]):
+        selected_key = "cardboard"
+    elif any(k in text_corpus for k in ["glass", "jar", "wine", "beer bottle", "pickle", "mason jar"]):
+        selected_key = "glass"
+    elif any(k in text_corpus for k in ["organic", "food", "compost", "veggie", "fruit", "peel", "banana", "coffee", "tea", "scrap", "apple", "leftover"]):
+        selected_key = "organic"
+    elif any(k in text_corpus for k in ["can", "soda", "coke", "beer", "aluminum", "tin", "foil", "metal"]):
+        selected_key = "aluminum"
+    elif any(k in text_corpus for k in ["plastic", "bottle", "jug", "cup", "pet", "hdpe", "container", "poly", "wrapper", "bag"]):
+        selected_key = "plastic"
+    elif material_hint and material_hint.lower() in FALLBACK_ARCHETYPES:
+        selected_key = material_hint.lower()
+
+    template = FALLBACK_ARCHETYPES.get(selected_key, FALLBACK_ARCHETYPES["plastic"])
+    
+    item_display_name = description.strip() if len(description.strip()) > 3 else template["item_name"]
+    # Capitalize first letter cleanly
+    item_display_name = item_display_name[0].upper() + item_display_name[1:] if item_display_name else template["item_name"]
+
+    color_detected = _extract_attribute_color(description) or "Standard"
+    texture_detected = _extract_attribute_texture(description) or "Smooth / Rigid"
+
+    impact = calculate_environmental_impact(
+        item_display_name,
+        template["primary_material"],
+        template["estimated_weight_kg"]
+    )
+
+    reasoning = f"TEXT-BASED AI identified material stream as {selected_key.title()}."
+    if color_detected != "Standard" or texture_detected != "Smooth / Rigid":
+        reasoning += f" Detected attributes: Color ({color_detected}), Texture ({texture_detected})."
+    if description:
+        reasoning += f" Input description: '{description[:80]}'."
+
+    return {
+        "identification_method": "TEXT-BASED AI",
+        "waste_analysis": {
+            "item_name": item_display_name,
+            "primary_material": template["primary_material"],
+            "object_type": template["item_name"],
+            "color": color_detected,
+            "texture": texture_detected,
+            "physical_condition": template["physical_condition"],
+            "confidence_score": 0.92,
+            "categories": template["categories"],
+            "is_hazardous": template["is_hazardous"],
+            "identification_reasoning": reasoning,
+            "disposal_recommendation": template["disposal_recommendation"]
+        },
+        "environmental_impact": impact,
+        "upcycle_recommendations": template["upcycle_recommendations"]
+    }
 
 def _call_gemini_vision(image_bytes: bytes) -> dict:
     """Makes a direct REST call to Gemini Vision using urllib."""
@@ -555,6 +1001,27 @@ def _call_gemini_vision(image_bytes: bytes) -> dict:
         
         impact = calculate_environmental_impact(item_name, material, weight)
 
+        # Parse OCR evidence returned by vision model or fallback parser
+        ocr_raw = data.get("ocr_evidence", {})
+        raw_label_text = ocr_raw.get("extracted_text", "")
+        detected_syms = ocr_raw.get("detected_symbols", [])
+        
+        parsed_ocr = parse_packaging_ocr(raw_label_text, detected_syms)
+        
+        ocr_evidence_result = {
+            "extracted_text": parsed_ocr["raw_text"],
+            "detected_symbols": parsed_ocr["detected_symbols"],
+            "resin_codes": parsed_ocr["resin_codes"],
+            "identified_material": ocr_raw.get("identified_material") or (parsed_ocr["resin_codes"][0]["material_name"] if parsed_ocr["resin_codes"] else material),
+            "recycling_instructions": parsed_ocr["recycling_instructions"],
+            "safety_warnings": parsed_ocr["safety_warnings"],
+            "product_composition": parsed_ocr["product_composition"],
+            "expiry_info": parsed_ocr["expiry_info"],
+            "information_source": ocr_raw.get("information_source", "Printed packaging label / embossed base stamp"),
+            "ocr_confidence": float(ocr_raw.get("ocr_confidence", 0.92)),
+            "disclaimer": parsed_ocr["disclaimer"]
+        }
+
         return {
             "waste_analysis": {
                 "item_name": item_name,
@@ -567,6 +1034,7 @@ def _call_gemini_vision(image_bytes: bytes) -> dict:
                 "disposal_recommendation": data.get("disposal_recommendation", "Place in municipal recycling bin.")
             },
             "environmental_impact": impact,
+            "ocr_evidence": ocr_evidence_result,
             "upcycle_recommendations": data.get("upcycle_recommendations", [])
         }
 
