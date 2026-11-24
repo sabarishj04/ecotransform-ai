@@ -365,14 +365,15 @@ def analyze_waste_image(image_bytes: bytes, filename: str = "") -> dict:
             if result:
                 return result
         except Exception as e:
-            print(f"[Gemini Service Warning] Live API call failed ({e}). Activating intelligent fallback.")
+            print(f"[Gemini Service Warning] Live API call failed ({e}). Activating intelligent fallback.", flush=True)
 
     # 2. Intelligent Offline Fallback
     return _generate_heuristic_analysis(image_bytes, filename)
 
 def _call_gemini_vision(image_bytes: bytes) -> dict:
-    """Makes a direct REST call to Gemini 1.5 Flash using urllib."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    """Makes a direct REST call to Gemini Vision using urllib."""
+    # Use gemini-2.5-flash or gemini-flash-latest (active on Google Generative Language API)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     
     b64_image = base64.b64encode(image_bytes).decode("utf-8")
     
