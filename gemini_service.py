@@ -291,6 +291,134 @@ FALLBACK_ARCHETYPES = {
             }
         ]
     },
+    "glass": {
+        "item_name": "Glass Bottle or Jar",
+        "primary_material": "Soda-Lime Silica Glass",
+        "physical_condition": "Intact, cleanable glass container",
+        "confidence_score": 0.90,
+        "categories": ["Recyclable", "Reusable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Characteristic optical clarity, rigid amorphous silica structure, and smooth reflective surface of glass containers.",
+        "disposal_recommendation": "Rinse clean. Remove metal lid separately. Place in glass recycling bin — do NOT mix with ceramics.",
+        "estimated_weight_kg": 0.350,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Herb & Succulent Tabletop Vase",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["Glass jar or bottle", "Twine or jute rope", "Small pebbles"],
+                "tools_needed": ["Scissors"],
+                "safety_precautions": ["Handle glass carefully; wrap in cloth when carrying to avoid drops."],
+                "steps": [
+                    "Clean the jar thoroughly with soap and water and allow to dry completely.",
+                    "Wrap twine or jute rope around the jar in tight rows and secure with a dab of craft glue.",
+                    "Place a layer of small pebbles at the bottom for drainage.",
+                    "Plant a succulent or herb cutting and place in a sunny windowsill."
+                ],
+                "sustainability_benefit": "Extends glass lifecycle by 12+ months as a home garden accent, reducing demand for ceramic plant pots."
+            },
+            {
+                "product_name": "Ambient Tealight Lantern",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.30,
+                "potential_value_usd": 7.00,
+                "materials_needed": ["Glass jar", "LED tealight or wax tea candle", "Sand or stones"],
+                "tools_needed": ["None"],
+                "safety_precautions": ["If using real candles, never leave unattended. Keep away from flammable materials."],
+                "steps": [
+                    "Fill the bottom 3cm of the jar with clean sand or decorative pebbles.",
+                    "Place an LED tealight on top of the sand layer.",
+                    "Optionally wrap the outside with copper wire for a rustic decorative finish.",
+                    "Arrange in clusters on a dining table or outdoor terrace."
+                ],
+                "sustainability_benefit": "Creates zero-waste ambient lighting without buying mass-produced glass lanterns."
+            },
+            {
+                "product_name": "Airtight Pantry Storage Jar",
+                "difficulty": "Easy",
+                "estimated_time_mins": 5,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 6.00,
+                "materials_needed": ["Glass jar with lid", "Label or chalk paint marker"],
+                "tools_needed": ["Sponge or cloth"],
+                "safety_precautions": ["Ensure jar is bone dry before storing dry goods to prevent mold."],
+                "steps": [
+                    "Remove all original labels by soaking in warm water for 20 minutes.",
+                    "Scrub away adhesive residue with vegetable oil and dish soap.",
+                    "Rinse, dry, and label with contents using a chalk paint marker.",
+                    "Use for spices, coffee, grains, and dry herbs in the pantry."
+                ],
+                "sustainability_benefit": "Eliminates single-use plastic food storage bags, keeping glass in active use."
+            }
+        ]
+    },
+    "organic": {
+        "item_name": "Organic Food Waste & Kitchen Scraps",
+        "primary_material": "Biodegradable Organic Matter",
+        "physical_condition": "Mixed vegetable, fruit peel, and food scraps",
+        "confidence_score": 0.88,
+        "categories": ["Biodegradable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Plant-based organic matter visible — fruit peels, vegetable scraps, coffee grounds, and food residue.",
+        "disposal_recommendation": "Compost at home or place in municipal green/organic waste bin. Do NOT landfill — composting reduces methane emissions.",
+        "estimated_weight_kg": 0.150,
+        "upcycle_recommendations": [
+            {
+                "product_name": "DIY Compost Bin & Soil Maker",
+                "difficulty": "Easy",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 2.00,
+                "potential_value_usd": 15.00,
+                "materials_needed": ["Plastic bin with lid", "Brown dried leaves or cardboard scraps", "Kitchen food scraps"],
+                "tools_needed": ["Drill for air holes"],
+                "safety_precautions": ["Do not compost meat, fish, or dairy — attract pests. Maintain moisture."],
+                "steps": [
+                    "Drill 10-12 air holes around the sides and lid of a large plastic bin.",
+                    "Layer 5cm of dry brown material (leaves/cardboard) at the bottom.",
+                    "Add food scraps in a 1:2 ratio with brown material.",
+                    "Turn the pile every 3-4 days and harvest rich compost in 6-8 weeks."
+                ],
+                "sustainability_benefit": "Diverts food waste from landfill, eliminating methane emissions and producing free fertilizer."
+            },
+            {
+                "product_name": "Natural Enzyme All-Purpose Cleaner",
+                "difficulty": "Medium",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["Citrus peels", "Brown sugar or molasses", "Water", "Glass bottle"],
+                "tools_needed": ["Measuring cups"],
+                "safety_precautions": ["Let gas escape by loosening cap occasionally for the first week. Store away from direct sunlight."],
+                "steps": [
+                    "Mix 1 part brown sugar with 3 parts citrus peel and 10 parts water in a glass bottle.",
+                    "Stir to dissolve sugar. Leave lid slightly loose for initial 24 hours.",
+                    "Store at room temperature for 3 months, stirring weekly.",
+                    "Dilute 1:10 with water and use as a natural kitchen and bathroom surface cleaner."
+                ],
+                "sustainability_benefit": "Replaces chemical-laden commercial cleaners with a biodegradable enzymatic alternative."
+            },
+            {
+                "product_name": "Liquid Plant Fertilizer Tea",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 5.00,
+                "materials_needed": ["Vegetable peels and food scraps", "Water", "Bucket"],
+                "tools_needed": ["Strainer"],
+                "safety_precautions": ["Use within 3 days. Do not use spoiled meat or cooked oils."],
+                "steps": [
+                    "Soak raw vegetable peels in 2 liters of water for 24-48 hours.",
+                    "Strain the liquid and discard solids into compost.",
+                    "Dilute the strained liquid 1:5 with water.",
+                    "Water plants at the root zone with this nutrient-rich organic fertilizer tea."
+                ],
+                "sustainability_benefit": "Recaptures vitamins and minerals from food waste as free organic plant nutrition."
+            }
+        ]
+    },
     "battery": {
         "item_name": "Alkaline / Lithium Battery (AA)",
         "primary_material": "Heavy Metal & Zinc-Manganese Dioxide / Lithium",
@@ -452,9 +580,13 @@ def _generate_heuristic_analysis(image_bytes: bytes, filename: str = "") -> dict
 
     if any(k in fn_lower for k in ["battery", "cell", "hazard", "lithium", "electronic", "duracell", "energizer", "aa", "aaa"]):
         selected_key = "battery"
-    elif any(k in fn_lower for k in ["cardboard", "box", "package", "carton"]):
+    elif any(k in fn_lower for k in ["cardboard", "box", "package", "carton", "paper", "kraft"]):
         selected_key = "cardboard"
-    elif any(k in fn_lower for k in ["plastic", "bottle", "jug", "cup", "pet", "hdpe", "container"]):
+    elif any(k in fn_lower for k in ["glass", "bottle", "jar", "wine", "beer_glass"]):
+        selected_key = "glass"
+    elif any(k in fn_lower for k in ["organic", "food", "compost", "veggie", "fruit", "peel", "kitchen"]):
+        selected_key = "organic"
+    elif any(k in fn_lower for k in ["plastic", "jug", "cup", "pet", "hdpe", "container"]):
         selected_key = "plastic"
     elif any(k in fn_lower for k in ["can", "soda", "coke", "beer", "aluminum"]):
         selected_key = "aluminum"
@@ -491,7 +623,15 @@ def _generate_heuristic_analysis(image_bytes: bytes, filename: str = "") -> dict
             if is_slender_cell:
                 selected_key = "battery"
             elif avg_r > 130 and avg_g > 100 and avg_b < 75:
+                # Brown/tan dominant → cardboard / kraft paper
                 selected_key = "cardboard"
+            elif (avg_g > avg_r + 8 and avg_g > avg_b + 8 and avg_g > 80) or \
+                 (avg_r > 160 and avg_g > 160 and avg_b > 160 and abs(avg_r - avg_g) < 20 and abs(avg_g - avg_b) < 20):
+                # Greenish tint (green glass / wine bottles) or high neutral luminance (clear glass)
+                selected_key = "glass"
+            elif avg_g > 90 and avg_r > 85 and avg_b < 70 and avg_g > avg_b + 20 and avg_g < 160:
+                # Yellow-green-brown organic tones (vegetables, fruit peels, food scraps)
+                selected_key = "organic"
             else:
                 # Default for mixed containers, bottles, cups, jugs, and packaging
                 selected_key = "plastic"
