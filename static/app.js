@@ -1371,6 +1371,38 @@ function renderScanResults(data, imageSrc) {
 }
 
 // ================= INSTANT DEMO PRESETS (HACKATHON WINNER) =================
+/**
+ * Renders an SVG string onto an offscreen canvas and returns a PNG data-URL.
+ * This converts the SVG to a real image format the backend can decode.
+ */
+function svgToPngDataUrl(svgString, width, height) {
+  return new Promise((resolve) => {
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width || 400;
+      canvas.height = height || 400;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.92));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      // Fallback: return a solid-colour JPEG via canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 400; canvas.height = 400;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(0, 0, 400, 400);
+      resolve(canvas.toDataURL('image/jpeg', 0.92));
+    };
+    img.src = url;
+  });
+}
+
 function loadSamplePreset(type) {
   // SVG presets encoded directly as data-URIs
   const sampleDataMap = {
@@ -1397,21 +1429,24 @@ function loadSamplePreset(type) {
   };
 
   const item = sampleDataMap[type] || sampleDataMap.plastic;
-  const dataUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(item.svg);
-
-  state.selectedBase64 = dataUrl;
-  state.selectedFile = null;
+  // Show SVG preview immediately (for instant visual feedback)
+  const svgDataUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(item.svg);
 
   switchTab('scanner');
   setScannerMode('upload');
-  renderImagePreview(dataUrl);
-  showActivePreviewBadge(dataUrl, item.name, 'Preset Sample Loaded');
-  validateScannerForm();
+  renderImagePreview(svgDataUrl);
+  showActivePreviewBadge(svgDataUrl, item.name, 'Preset Sample Loaded');
 
-  // Trigger analysis immediately for lightning demo
-  setTimeout(() => {
-    submitUnifiedAnalysis();
-  }, 350);
+  // Convert SVG → PNG so the backend receives a valid JPEG image
+  svgToPngDataUrl(item.svg, 400, 400).then((pngDataUrl) => {
+    state.selectedBase64 = pngDataUrl;
+    state.selectedFile = null;
+    validateScannerForm();
+    // Trigger analysis after conversion is complete
+    setTimeout(() => {
+      submitUnifiedAnalysis();
+    }, 200);
+  });
 }
 
 // ================= DASHBOARD & CHARTS (REAL USER VS DEMO DATA) =================

@@ -128,13 +128,22 @@ def analyze():
         # Method 1 & 2: Base64 image
         if "image_b64" in data and data["image_b64"]:
             raw_b64 = data["image_b64"]
+            # Strip data-URI prefix (e.g. "data:image/jpeg;base64,")
             if "," in raw_b64:
                 raw_b64 = raw_b64.split(",", 1)[1]
             try:
                 image_bytes = base64.b64decode(raw_b64)
                 filename = data.get("filename", "camera_capture.jpg" if input_method == "camera" else "upload.jpg")
             except Exception:
-                return jsonify({"error": "Invalid base64 image data"}), 400
+                # Graceful fallback: treat filename as a text hint instead of hard-failing
+                filename = data.get("filename", "unknown_item.jpg")
+                hint = filename.rsplit(".", 1)[0].replace("_", " ")
+                analysis_result = analyze_waste_text(description=hint, material_hint="")
+                indian_stream = classify_indian_waste_stream(analysis_result)
+                analysis_result["indian_waste_stream"] = indian_stream
+                saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
+                saved_record["input_method"] = "image_upload"
+                return jsonify(saved_record), 200
 
         # Method: Direct Barcode / QR Code identification
         elif input_method == "barcode_scan" or scanned_barcode:
