@@ -728,8 +728,8 @@ function handleFile(file) {
     showScannerError('Please select a valid image file (JPEG, PNG, WEBP, HEIC).');
     return;
   }
-  if (file.size > 6 * 1024 * 1024) {
-    showScannerError('Image file exceeds the 6MB limit. Please choose a smaller image.');
+  if (file.size > 10 * 1024 * 1024) {
+    showScannerError('Image file exceeds the 10MB limit. Please choose a smaller image.');
     return;
   }
 

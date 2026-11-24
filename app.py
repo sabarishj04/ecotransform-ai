@@ -20,7 +20,7 @@ from intelligence_engine import fuse_evidence
 from centers_service import search_recycling_centres, VERIFIED_RECYCLING_CENTRES
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 6MB limit
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10MB limit
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 
