@@ -484,7 +484,7 @@ async function submitUnifiedAnalysis(bypassClarification = false, clarificationA
       payload = {
         input_method: 'image_upload',
         image_b64: state.selectedBase64,
-        filename: 'upload.jpg'
+        filename: state.selectedFilename || 'upload.jpg'
       };
     } else {
       showScannerError('Please select or drag-and-drop a waste image file.');
@@ -1441,6 +1441,7 @@ function loadSamplePreset(type) {
   svgToPngDataUrl(item.svg, 400, 400).then((pngDataUrl) => {
     state.selectedBase64 = pngDataUrl;
     state.selectedFile = null;
+    state.selectedFilename = item.name;
     validateScannerForm();
     // Trigger analysis after conversion is complete
     setTimeout(() => {

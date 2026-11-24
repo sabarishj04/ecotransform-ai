@@ -1131,14 +1131,14 @@ def _generate_heuristic_analysis(image_bytes: bytes, filename: str = "") -> dict
         selected_key = "battery"
     elif any(k in fn_lower for k in ["cardboard", "box", "package", "carton", "paper", "kraft"]):
         selected_key = "cardboard"
-    elif any(k in fn_lower for k in ["glass", "bottle", "jar", "wine", "beer_glass"]):
+    elif any(k in fn_lower for k in ["can", "soda", "coke", "beer", "aluminum", "tin"]):
+        selected_key = "aluminum"
+    elif any(k in fn_lower for k in ["plastic", "jug", "cup", "pet", "hdpe", "container", "poly"]):
+        selected_key = "plastic"
+    elif any(k in fn_lower for k in ["glass", "wine", "beer_glass", "jar"]):
         selected_key = "glass"
     elif any(k in fn_lower for k in ["organic", "food", "compost", "veggie", "fruit", "peel", "kitchen"]):
         selected_key = "organic"
-    elif any(k in fn_lower for k in ["plastic", "jug", "cup", "pet", "hdpe", "container"]):
-        selected_key = "plastic"
-    elif any(k in fn_lower for k in ["can", "soda", "coke", "beer", "aluminum"]):
-        selected_key = "aluminum"
     else:
         try:
             img = Image.open(io.BytesIO(image_bytes))
