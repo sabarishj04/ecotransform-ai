@@ -111,6 +111,66 @@ Return strictly a valid JSON object matching this schema without markdown codebl
 }
 """
 
+# Indian Solid Waste Management Rules (SWM 2016) Waste Streams:
+# 1. Wet Waste (Pacha Koodai / Green Bin) - Biodegradable kitchen & garden waste
+# 2. Dry Waste (Neela Koodai / Blue Bin) - Recyclable packaging, plastics, paper, metals, glass
+# 3. Sanitary Waste (Sivappu Koodai / Red Bin or wrapped) - Diapers, sanitary napkins, bandages
+# 4. Special-Care / Domestic Hazardous Waste (Black/Yellow Bin) - E-waste, batteries, paint, medicines, tube lights
+
+def classify_indian_waste_stream(item_name: str, material: str, is_hazardous: bool = False) -> dict:
+    """
+    Classifies waste into mandatory Indian SWM Rules (2016) categories with
+    color-coded bin guidance and Tamil terminology.
+    """
+    text = (item_name + " " + material).lower()
+
+    # 1. Sanitary Waste (Diapers, pads, bandages, soiled tissues)
+    if any(k in text for k in ["diaper", "sanitary", "pad", "napkin", "bandage", "medical cotton", "soiled tissue"]):
+        return {
+            "stream_code": "sanitary",
+            "stream_name": "Sanitary Waste",
+            "stream_name_ta": "சுகாதாரக் கழிவு (Sanitary)",
+            "bin_color": "Red / Secure Wrap",
+            "bin_color_ta": "சிவப்பு / தனி பை",
+            "guidance_en": "Wrap securely in newspaper with a red cross marking. Hand over separately to sanitary waste collectors; never mix with wet or dry recyclables.",
+            "guidance_ta": "செய்தித்தாளில் பாதுகாப்பாக சுற்றி சிவப்பு 'X' குறியிட்டு தனியாக தூய்மைப் பணியாளர்களிடம் ஒப்படைக்கவும்."
+        }
+
+    # 2. Special-Care / Domestic Hazardous Waste (Batteries, e-waste, CFL/LED, chemicals, medicine)
+    if is_hazardous or any(k in text for k in ["battery", "e-waste", "circuit", "electronic", "bulb", "tube", "cfl", "led", "paint", "pesticide", "medicine", "syringe", "chemical", "thermometer"]):
+        return {
+            "stream_code": "special-care",
+            "stream_name": "Special-Care Waste (Domestic Hazardous)",
+            "stream_name_ta": "சிறப்பு கவனம் / அபாயக் கழிவு",
+            "bin_color": "Black / Safe Bin",
+            "bin_color_ta": "கருப்பு தொட்டி",
+            "guidance_en": "Do not break or burn. Store dry in a sealed box and deposit at an authorized CPCB/TNPCB e-waste dismantler or municipal hazardous waste drop-off.",
+            "guidance_ta": "உடைக்கவோ எரிக்கவோ கூடாது. பாதுகாப்பான பெட்டியில் வைத்து அங்கீகரிக்கப்பட்ட மறுசுழற்சி மையத்தில் ஒப்படைக்கவும்."
+        }
+
+    # 3. Wet Waste (Organic, kitchen food waste, leaves)
+    if any(k in text for k in ["food", "organic", "peel", "vegetable", "fruit", "leftover", "leaf", "compost", "biodegradable", "tea bag", "egg shell"]):
+        return {
+            "stream_code": "wet",
+            "stream_name": "Wet Waste (Biodegradable)",
+            "stream_name_ta": "ஈரக் கழிவு (மக்கும் குப்பை)",
+            "bin_color": "Green Bin",
+            "bin_color_ta": "பச்சை தொட்டி",
+            "guidance_en": "Keep free of plastic liners. Deposit in your municipal green bin for micro-composting (MCC) or use directly in home garden compost.",
+            "guidance_ta": "பிளாஸ்டிக் பையின்றி பச்சை தொட்டியில் போடவும் அல்லது வீட்டுத் தோட்ட உரமாக மாற்றவும்."
+        }
+
+    # 4. Dry Waste (Default: Recyclable non-biodegradable)
+    return {
+        "stream_code": "dry",
+        "stream_name": "Dry Waste (Non-Biodegradable Recyclable)",
+        "stream_name_ta": "உலர் கழிவு (மறுசுழற்சி குப்பை)",
+        "bin_color": "Blue Bin",
+        "bin_color_ta": "நீல தொட்டி",
+        "guidance_en": "Rinse clean and dry completely to prevent foul odors. Flatten to reduce volume, store dry, and place in municipal blue bin or sell to local Kabadiwala / scrap dealer.",
+        "guidance_ta": "கழுவி உலர வைத்து நீல தொட்டியில் போடவும் அல்லது உள்ளூர் பழைய இரும்பு/பிளாஸ்டிக் வியாபாரியிடம் விற்கவும்."
+    }
+
 # Fallback smart archetypes based on dominant color or filename/preset
 FALLBACK_ARCHETYPES = {
     "plastic": {
@@ -648,6 +708,17 @@ def analyze_waste_image(image_bytes: bytes, filename: str = "") -> dict:
         ocr_parsed = _heuristic_ocr_extract(image_bytes, filename, result.get("waste_analysis", {}))
         result["ocr_evidence"] = ocr_parsed
 
+    # Attach Indian SWM 2016 Waste Stream Classification
+    analysis = result.get("waste_analysis", {})
+    item_name = analysis.get("item_name", "")
+    mat = analysis.get("primary_material", "")
+    is_haz = analysis.get("is_hazardous", False)
+    indian_stream = classify_indian_waste_stream(item_name, mat, is_haz)
+    result["indian_waste_stream"] = indian_stream
+    analysis["indian_waste_stream"] = indian_stream
+    if "municipal" in analysis.get("disposal_recommendation", "").lower():
+        analysis["disposal_recommendation"] = f"[{indian_stream['stream_name']} - {indian_stream['bin_color']}] {indian_stream['guidance_en']}"
+
     return result
 
 def _heuristic_ocr_extract(image_bytes: bytes, filename: str, waste_analysis: dict) -> dict:
@@ -772,11 +843,21 @@ def analyze_waste_text(description: str, material_hint: str = "", clarification_
         try:
             result = _call_gemini_text(combined_desc, material_hint)
             if result:
+                # Attach Indian SWM stream
+                ans = result.get("waste_analysis", {})
+                st = classify_indian_waste_stream(ans.get("item_name", ""), ans.get("primary_material", ""), ans.get("is_hazardous", False))
+                result["indian_waste_stream"] = st
+                ans["indian_waste_stream"] = st
                 return result
         except Exception as e:
             print(f"[Gemini Service Warning] Live text API call failed ({e}). Using intelligent fallback.", flush=True)
 
-    return _generate_heuristic_text_analysis(combined_desc, material_hint)
+    result = _generate_heuristic_text_analysis(combined_desc, material_hint)
+    ans = result.get("waste_analysis", {})
+    st = classify_indian_waste_stream(ans.get("item_name", ""), ans.get("primary_material", ""), ans.get("is_hazardous", False))
+    result["indian_waste_stream"] = st
+    ans["indian_waste_stream"] = st
+    return result
 
 def _call_gemini_text(description: str, material_hint: str = "") -> dict:
     """Makes a direct REST call to Gemini for natural language waste description analysis."""

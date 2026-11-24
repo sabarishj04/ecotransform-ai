@@ -6,14 +6,14 @@ SQLite schema and CRUD operations for scans, material analysis, recommendations,
 import sqlite3
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance")
 DB_PATH = os.path.join(DB_DIR, "ecotransform.db")
 
 def init_db():
-    """Initializes the database schema if not already created."""
+    """Initializes and migrates the database schema."""
     os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -46,19 +46,36 @@ def init_db():
     )
     """)
 
-    # 3. Environmental Impact Table
+    # 3. Environmental Impact Table (Enhanced with energy, economic value, and user confirmed weight)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS environmental_impact (
         id TEXT PRIMARY KEY,
         scan_id TEXT NOT NULL UNIQUE,
         estimated_weight_kg REAL NOT NULL,
-        co2_avoided_kg REAL NOT NULL,
-        water_saved_liters REAL NOT NULL,
+        co2_avoided_kg REAL,
+        water_saved_liters REAL,
+        energy_saved_kwh REAL,
         landfill_diverted_kg REAL NOT NULL,
+        economic_value_inr REAL,
+        scenario TEXT DEFAULT 'recycling',
+        is_user_confirmed INTEGER DEFAULT 0,
         benchmarking_note TEXT,
         FOREIGN KEY (scan_id) REFERENCES scans (id) ON DELETE CASCADE
     )
     """)
+
+    # Migration: check and add missing columns if upgrading existing DB
+    cursor.execute("PRAGMA table_info(environmental_impact)")
+    existing_cols = [row[1] for row in cursor.fetchall()]
+
+    if "energy_saved_kwh" not in existing_cols:
+        cursor.execute("ALTER TABLE environmental_impact ADD COLUMN energy_saved_kwh REAL")
+    if "economic_value_inr" not in existing_cols:
+        cursor.execute("ALTER TABLE environmental_impact ADD COLUMN economic_value_inr REAL")
+    if "scenario" not in existing_cols:
+        cursor.execute("ALTER TABLE environmental_impact ADD COLUMN scenario TEXT DEFAULT 'recycling'")
+    if "is_user_confirmed" not in existing_cols:
+        cursor.execute("ALTER TABLE environmental_impact ADD COLUMN is_user_confirmed INTEGER DEFAULT 0")
 
     # 4. Upcycle Recommendations Table
     cursor.execute("""
@@ -97,7 +114,7 @@ def save_scan_result(session_id, scan_data, image_preview=""):
     conn = get_db_connection()
     cursor = conn.cursor()
     scan_id = str(uuid.uuid4())
-    now_iso = datetime.utcnow().isoformat() + "Z"
+    now_iso = datetime.now(timezone.utc).isoformat()
 
     analysis = scan_data.get("waste_analysis", {})
     impact = scan_data.get("environmental_impact", {})
@@ -140,16 +157,21 @@ def save_scan_result(session_id, scan_data, image_preview=""):
     cursor.execute("""
     INSERT INTO environmental_impact (
         id, scan_id, estimated_weight_kg, co2_avoided_kg,
-        water_saved_liters, landfill_diverted_kg, benchmarking_note
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        water_saved_liters, energy_saved_kwh, landfill_diverted_kg,
+        economic_value_inr, scenario, is_user_confirmed, benchmarking_note
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         impact_id,
         scan_id,
-        float(impact.get("estimated_weight_kg", 0.05)),
-        float(impact.get("co2_avoided_kg", 0.1)),
-        float(impact.get("water_saved_liters", 0.5)),
-        float(impact.get("landfill_diverted_kg", 0.05)),
-        impact.get("benchmarking_note", "EPA WARM benchmark estimate.")
+        impact.get("estimated_weight_kg", 0.05),
+        impact.get("co2_avoided_kg"),
+        impact.get("water_saved_liters"),
+        impact.get("energy_saved_kwh"),
+        impact.get("landfill_diverted_kg", 0.05),
+        impact.get("economic_value_inr"),
+        impact.get("scenario", "recycling"),
+        1 if impact.get("is_user_confirmed") else 0,
+        impact.get("benchmarking_note", "CPCB & Central Electricity Authority Lifecycle Benchmarks")
     ))
 
     # 4. Insert Recommendations
@@ -164,16 +186,16 @@ def save_scan_result(session_id, scan_data, image_preview=""):
         """, (
             rec_id,
             scan_id,
-            rec.get("product_name", "Upcycled Product"),
-            rec.get("difficulty", "Medium"),
-            int(rec.get("estimated_time_mins", 30)),
-            float(rec.get("estimated_cost_usd", 1.0)),
-            float(rec.get("potential_value_usd", 5.0)),
+            rec.get("product_name", "Upcycled Project"),
+            rec.get("difficulty", "Easy"),
+            rec.get("estimated_time_mins", 30),
+            rec.get("estimated_cost_usd", 2.0),
+            rec.get("potential_value_usd", 15.0),
             json.dumps(rec.get("materials_needed", [])),
             json.dumps(rec.get("tools_needed", [])),
             json.dumps(rec.get("steps", [])),
             json.dumps(rec.get("safety_precautions", [])),
-            rec.get("sustainability_benefit", "Prevents waste and extends lifecycle.")
+            rec.get("sustainability_benefit", "Prevents landfill waste.")
         ))
 
     conn.commit()
@@ -181,26 +203,74 @@ def save_scan_result(session_id, scan_data, image_preview=""):
 
     scan_data["scan_id"] = scan_id
     scan_data["created_at"] = now_iso
+    scan_data["image_preview"] = image_preview
     return scan_data
 
-def get_scan_history(session_id, limit=20):
-    """Retrieves all non-deleted scans for a given session."""
+def update_scan_weight_and_impact(scan_id: str, new_impact: dict, session_id: str = None) -> bool:
+    """Updates the weight, scenario, and environmental metrics for an existing scan."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    where_clause = "scan_id = ?"
+    params = [
+        new_impact.get("estimated_weight_kg", 0.05),
+        new_impact.get("co2_avoided_kg"),
+        new_impact.get("water_saved_liters"),
+        new_impact.get("energy_saved_kwh"),
+        new_impact.get("landfill_diverted_kg", 0.05),
+        new_impact.get("economic_value_inr"),
+        new_impact.get("scenario", "recycling"),
+        1 if new_impact.get("is_user_confirmed") else 0,
+        new_impact.get("benchmarking_note", ""),
+        scan_id
+    ]
+
     cursor.execute("""
+    UPDATE environmental_impact
+    SET estimated_weight_kg = ?,
+        co2_avoided_kg = ?,
+        water_saved_liters = ?,
+        energy_saved_kwh = ?,
+        landfill_diverted_kg = ?,
+        economic_value_inr = ?,
+        scenario = ?,
+        is_user_confirmed = ?,
+        benchmarking_note = ?
+    WHERE scan_id = ?
+    """, params)
+
+    affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return affected > 0
+
+def get_scan_history(session_id=None, limit=20):
+    """Retrieves recent scans filtered by session or global."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = """
     SELECT s.id, s.item_name, s.confidence_score, s.image_preview, s.created_at,
-           m.primary_material, m.categories_csv, m.is_hazardous,
-           e.co2_avoided_kg, e.landfill_diverted_kg
+           m.primary_material, m.categories_csv,
+           e.estimated_weight_kg, e.co2_avoided_kg, e.water_saved_liters, e.energy_saved_kwh,
+           e.landfill_diverted_kg, e.economic_value_inr, e.scenario, e.is_user_confirmed
     FROM scans s
     LEFT JOIN material_analysis m ON s.id = m.scan_id
     LEFT JOIN environmental_impact e ON s.id = e.scan_id
-    WHERE s.session_id = ? AND s.is_deleted = 0
-    ORDER BY s.created_at DESC
-    LIMIT ?
-    """, (session_id, limit))
+    WHERE s.is_deleted = 0
+    """
+    params = []
+    if session_id:
+        query += " AND s.session_id = ?"
+        params.append(session_id)
 
+    query += " ORDER BY s.created_at DESC LIMIT ?"
+    params.append(limit)
+
+    cursor.execute(query, params)
     rows = cursor.fetchall()
+    conn.close()
+
     history = []
     for r in rows:
         history.append({
@@ -211,16 +281,21 @@ def get_scan_history(session_id, limit=20):
             "created_at": r["created_at"],
             "primary_material": r["primary_material"],
             "categories": r["categories_csv"].split(",") if r["categories_csv"] else [],
-            "is_hazardous": bool(r["is_hazardous"]),
-            "co2_avoided_kg": r["co2_avoided_kg"],
-            "landfill_diverted_kg": r["landfill_diverted_kg"]
+            "impact": {
+                "estimated_weight_kg": r["estimated_weight_kg"],
+                "co2_avoided_kg": r["co2_avoided_kg"],
+                "water_saved_liters": r["water_saved_liters"],
+                "energy_saved_kwh": r["energy_saved_kwh"],
+                "landfill_diverted_kg": r["landfill_diverted_kg"],
+                "economic_value_inr": r["economic_value_inr"],
+                "scenario": r["scenario"],
+                "is_user_confirmed": bool(r["is_user_confirmed"])
+            }
         })
-
-    conn.close()
     return history
 
 def get_scan_detail(scan_id):
-    """Retrieves full details for a single scan, including 3 upcycle recommendations."""
+    """Returns complete details of a specific scan."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -228,7 +303,8 @@ def get_scan_detail(scan_id):
     SELECT s.id, s.session_id, s.item_name, s.confidence_score, s.image_preview, s.created_at,
            m.primary_material, m.physical_condition, m.categories_csv, m.is_hazardous,
            m.identification_reasoning, m.disposal_recommendation,
-           e.estimated_weight_kg, e.co2_avoided_kg, e.water_saved_liters, e.landfill_diverted_kg, e.benchmarking_note
+           e.estimated_weight_kg, e.co2_avoided_kg, e.water_saved_liters, e.energy_saved_kwh,
+           e.landfill_diverted_kg, e.economic_value_inr, e.scenario, e.is_user_confirmed, e.benchmarking_note
     FROM scans s
     LEFT JOIN material_analysis m ON s.id = m.scan_id
     LEFT JOIN environmental_impact e ON s.id = e.scan_id
@@ -286,7 +362,11 @@ def get_scan_detail(scan_id):
             "estimated_weight_kg": r["estimated_weight_kg"],
             "co2_avoided_kg": r["co2_avoided_kg"],
             "water_saved_liters": r["water_saved_liters"],
+            "energy_saved_kwh": r["energy_saved_kwh"],
             "landfill_diverted_kg": r["landfill_diverted_kg"],
+            "economic_value_inr": r["economic_value_inr"],
+            "scenario": r["scenario"] or "recycling",
+            "is_user_confirmed": bool(r["is_user_confirmed"]),
             "benchmarking_note": r["benchmarking_note"]
         },
         "upcycle_recommendations": recs
@@ -321,21 +401,14 @@ def get_dashboard_stats(session_id=None):
         COUNT(s.id) as total_scans,
         COALESCE(SUM(e.landfill_diverted_kg), 0) as total_landfill_kg,
         COALESCE(SUM(e.co2_avoided_kg), 0) as total_co2_kg,
-        COALESCE(SUM(e.water_saved_liters), 0) as total_water_liters
+        COALESCE(SUM(e.water_saved_liters), 0) as total_water_liters,
+        COALESCE(SUM(e.energy_saved_kwh), 0) as total_energy_kwh,
+        COALESCE(SUM(e.economic_value_inr), 0) as total_economic_inr
     FROM scans s
     LEFT JOIN environmental_impact e ON s.id = e.scan_id
     {where_clause}
     """, params)
     agg = cursor.fetchone()
-
-    # Potential wealth generated
-    cursor.execute(f"""
-    SELECT COALESCE(SUM(r.potential_value_usd), 0) as total_wealth_potential
-    FROM recommendations r
-    JOIN scans s ON r.scan_id = s.id
-    {where_clause}
-    """, params)
-    wealth_row = cursor.fetchone()
 
     # Material breakdown
     cursor.execute(f"""
@@ -350,13 +423,32 @@ def get_dashboard_stats(session_id=None):
     mat_rows = cursor.fetchall()
     material_breakdown = [{"material": r["primary_material"], "count": r["count"]} for r in mat_rows]
 
+    # Total Upcycling Recommendations generated
+    cursor.execute(f"""
+    SELECT COUNT(r.id) as total_blueprints
+    FROM recommendations r
+    JOIN scans s ON r.scan_id = s.id
+    {where_clause}
+    """, params)
+    bp_row = cursor.fetchone()
+
     conn.close()
 
+    total_scans = agg["total_scans"] or 0
+    total_landfill_kg = round(agg["total_landfill_kg"] or 0.0, 3)
+    total_weight_kg = total_landfill_kg  # Material weight diverted from waste stream
+
     return {
-        "total_scans": agg["total_scans"],
-        "total_landfill_kg": round(agg["total_landfill_kg"], 3),
-        "total_co2_kg": round(agg["total_co2_kg"], 3),
-        "total_water_liters": round(agg["total_water_liters"], 1),
-        "total_wealth_potential_usd": round(wealth_row["total_wealth_potential"], 2),
-        "material_breakdown": material_breakdown
+        "total_scans": total_scans,
+        "total_waste_identified": total_scans,
+        "total_material_weight_kg": total_weight_kg,
+        "total_material_weight_g": round(total_weight_kg * 1000.0, 1),
+        "total_landfill_kg": total_landfill_kg,
+        "total_co2_kg": round(agg["total_co2_kg"] or 0.0, 3),
+        "total_water_liters": round(agg["total_water_liters"] or 0.0, 1),
+        "total_energy_kwh": round(agg["total_energy_kwh"] or 0.0, 2),
+        "total_economic_inr": round(agg["total_economic_inr"] or 0.0, 2),
+        "total_blueprints": bp_row["total_blueprints"] if bp_row else (total_scans * 3),
+        "material_breakdown": material_breakdown,
+        "is_empty": (total_scans == 0)
     }

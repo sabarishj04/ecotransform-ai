@@ -23,7 +23,10 @@ const state = {
   currentScanData: null,
   historyData: [],
   dashboardChart: null,
-  cameraStream: null
+  cameraStream: null,
+  dashboardScope: 'personal', // 'personal' (real user activity) vs 'global' (demo)
+  language: localStorage.getItem('ecotransform_lang') || 'en',
+  centresList: []
 };
 
 function getOrCreateSessionId() {
@@ -241,20 +244,6 @@ function validateScannerForm() {
     if (loadSubtext) loadSubtext.textContent = 'Retrieving manufacturer packaging disclosure and lifecycle metrics...';
 
   } else if (state.scannerMode === 'text') {
-    const textVal = (document.getElementById('text-waste-description')?.value || '').trim();
-    isValid = textVal.length >= 3;
-  } else if (state.scannerMode === 'manual') {
-    const catVal = (document.getElementById('manual-material-select')?.value || '').trim();
-    isValid = !!catVal;
-  }
-
-  btn.disabled = !isValid;
-  if (isValid) {
-    btn.classList.remove('opacity-40', 'cursor-not-allowed');
-  } else {
-    btn.classList.add('opacity-40', 'cursor-not-allowed');
-  }
-}
     const textVal = (document.getElementById('text-waste-description')?.value || '').trim();
     isValid = textVal.length >= 3;
   } else if (state.scannerMode === 'manual') {
@@ -615,6 +604,8 @@ function switchTab(tabId) {
   // Trigger data refreshes on view entrance
   if (tabId === 'dashboard') {
     fetchDashboardStats();
+  } else if (tabId === 'centres') {
+    fetchRecyclingCentres();
   } else if (tabId === 'history') {
     fetchHistory();
   }
@@ -622,6 +613,11 @@ function switchTab(tabId) {
 
 // ================= DRAG & DROP & PREVIEW =================
 document.addEventListener('DOMContentLoaded', () => {
+  // Apply saved language preferences on boot
+  if (state.language) {
+    setAppLanguage(state.language);
+  }
+
   const dropArea = document.getElementById('drop-area');
   const fileInput = document.getElementById('file-input');
 
@@ -818,6 +814,173 @@ async function submitAnalysis() {
     btnText.textContent = 'Analyze Waste Material';
     laser.classList.add('hidden');
     loading.classList.add('hidden');
+  }
+}
+
+// ================= SUSTAINABILITY CALCULATOR HELPER =================
+function updateImpactDisplay(impact, analysis) {
+  if (!impact) return;
+
+  // 1. Weight controls & values
+  const weightInput = document.getElementById('calc-weight-input');
+  const unitSelect = document.getElementById('calc-unit-select');
+  const scenarioSelect = document.getElementById('calc-scenario-select');
+  const statusBadge = document.getElementById('weight-status-badge');
+  const hintElem = document.getElementById('suggested-weight-hint');
+
+  const unit = impact.display_unit || (unitSelect ? unitSelect.value : 'g');
+  const weightVal = unit === 'kg' ? impact.estimated_weight_kg : (impact.weight_grams || Math.round(impact.estimated_weight_kg * 1000));
+  
+  if (weightInput) weightInput.value = weightVal;
+  if (unitSelect) unitSelect.value = unit;
+  if (scenarioSelect && impact.scenario) scenarioSelect.value = impact.scenario;
+
+  if (hintElem && impact.suggested_weight_kg) {
+    const sugG = Math.round(impact.suggested_weight_kg * 1000);
+    hintElem.textContent = `(AI Suggestion: ${sugG} g)`;
+  }
+
+  if (statusBadge) {
+    if (impact.is_user_confirmed) {
+      statusBadge.textContent = 'User-Confirmed';
+      statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200';
+    } else {
+      statusBadge.textContent = 'AI Suggestion';
+      statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200';
+    }
+  }
+
+  // 2. Metric Cards Values
+  const co2Elem = document.getElementById('res-impact-co2');
+  if (co2Elem) {
+    co2Elem.textContent = impact.co2_avoided_kg !== null && impact.co2_avoided_kg !== undefined 
+      ? `${impact.co2_avoided_kg.toFixed(3)} kg` 
+      : 'Data unavailable';
+  }
+
+  const landElem = document.getElementById('res-impact-landfill');
+  if (landElem) {
+    landElem.textContent = impact.landfill_diverted_kg !== null && impact.landfill_diverted_kg !== undefined 
+      ? `${impact.landfill_diverted_kg.toFixed(3)} kg` 
+      : 'Data unavailable';
+  }
+
+  const waterElem = document.getElementById('res-impact-water');
+  if (waterElem) {
+    waterElem.textContent = impact.water_saved_liters !== null && impact.water_saved_liters !== undefined 
+      ? `${impact.water_saved_liters.toFixed(1)} L` 
+      : 'Data unavailable';
+  }
+
+  const energyElem = document.getElementById('res-impact-energy');
+  if (energyElem) {
+    energyElem.textContent = impact.energy_saved_kwh !== null && impact.energy_saved_kwh !== undefined 
+      ? `${impact.energy_saved_kwh.toFixed(3)} kWh` 
+      : 'Data unavailable';
+  }
+
+  const weightElem = document.getElementById('res-impact-weight');
+  const weightSub = document.getElementById('res-impact-weight-sub');
+  if (weightElem) {
+    const gVal = (impact.weight_grams || (impact.estimated_weight_kg * 1000)).toFixed(1);
+    weightElem.textContent = `${gVal} g`;
+  }
+  if (weightSub) {
+    weightSub.textContent = `${(impact.estimated_weight_kg || 0.05).toFixed(3)} kg`;
+  }
+
+  const econElem = document.getElementById('res-impact-economic');
+  if (econElem) {
+    econElem.textContent = impact.economic_value_inr !== null && impact.economic_value_inr !== undefined 
+      ? `₹${impact.economic_value_inr.toFixed(2)}` 
+      : 'Data unavailable';
+  }
+
+  // 3. Calculation Explanation formulas
+  const expl = impact.calculation_explanation || {};
+  const fCo2 = document.getElementById('expl-co2-formula');
+  if (fCo2) fCo2.textContent = expl.co2_formula || 'Calculated via CPCB emission factors';
+
+  const fEnergy = document.getElementById('expl-energy-formula');
+  if (fEnergy) fEnergy.textContent = expl.energy_formula || 'Based on CEA grid emission baseline';
+
+  const fWater = document.getElementById('expl-water-formula');
+  if (fWater) fWater.textContent = expl.water_formula || 'Industrial process water conserved';
+
+  const fEcon = document.getElementById('expl-economic-formula');
+  if (fEcon) fEcon.textContent = expl.economic_formula || 'Based on Indian scrap market indices';
+
+  const fCite = document.getElementById('expl-source-cite');
+  if (fCite) fCite.textContent = expl.emission_factor_citation || impact.data_source || 'CPCB India PWM Rules & TERI LCA';
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+async function recalculateCurrentScanImpact() {
+  if (!state.currentScanData) return;
+
+  const weightInput = document.getElementById('calc-weight-input');
+  const unitSelect = document.getElementById('calc-unit-select');
+  const scenarioSelect = document.getElementById('calc-scenario-select');
+  const btn = document.getElementById('btn-recalculate-impact');
+
+  const rawWeight = parseFloat(weightInput.value);
+  if (isNaN(rawWeight) || rawWeight <= 0) {
+    alert('Please enter a valid positive numeric weight (e.g., 25 or 0.025).');
+    return;
+  }
+
+  const unit = unitSelect ? unitSelect.value : 'g';
+  const scenario = scenarioSelect ? scenarioSelect.value : 'recycling';
+  const analysis = state.currentScanData.waste_analysis || {};
+  const scanId = state.currentScanData.scan_id || state.currentScanData.id;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="inline-block animate-spin mr-1">↻</span> Calculating...';
+  }
+
+  try {
+    const res = await fetch('/api/impact/recalculate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Session-ID': state.sessionId
+      },
+      body: JSON.stringify({
+        item_name: analysis.item_name || 'Waste Item',
+        primary_material: analysis.primary_material || 'Plastic',
+        weight: rawWeight,
+        unit: unit,
+        scenario: scenario,
+        is_user_confirmed: true,
+        scan_id: scanId
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.message || 'Recalculation failed.');
+      return;
+    }
+
+    const updatedImpact = await res.json();
+    state.currentScanData.environmental_impact = updatedImpact;
+    updateImpactDisplay(updatedImpact, analysis);
+
+    // Refresh dashboard stats so verified weight updates live totals
+    fetchDashboardStats();
+  } catch (err) {
+    console.error('Error recalculating impact:', err);
+    alert('Failed to connect to impact calculation service.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i><span>Recalculate</span>';
+      if (window.lucide) window.lucide.createIcons();
+    }
   }
 }
 
@@ -1063,10 +1226,10 @@ function renderScanResults(data, imageSrc) {
     }
   }
 
-  // Environmental Metrics
-  document.getElementById('res-impact-co2').textContent = `${impact.co2_avoided_kg || 0.05} kg`;
-  document.getElementById('res-impact-landfill').textContent = `${impact.landfill_diverted_kg || 0.02} kg`;
-  document.getElementById('res-impact-water').textContent = `${impact.water_saved_liters || 0.3} L`;
+  // Environmental & Economic Impact Metrics (India Benchmarks)
+  state.currentScanData = data; // store globally for recalculation
+  updateImpactDisplay(impact, analysis);
+  renderIndianWasteStream(data);
 
   // Render 3 Waste-to-Wealth Recommendations
   const recGrid = document.getElementById('res-recommendations-grid');
@@ -1082,7 +1245,9 @@ function renderScanResults(data, imageSrc) {
     if (diff === 'medium') diffColor = 'bg-amber-100 text-amber-800';
     if (diff === 'hard') diffColor = 'bg-indigo-100 text-indigo-800';
 
-    const profit = Math.max(0, (rec.potential_value_usd || 5) - (rec.estimated_cost_usd || 0)).toFixed(2);
+    const costInr = Math.round((rec.estimated_cost_usd || 1) * 83);
+    const valueInr = Math.round((rec.potential_value_usd || 6) * 83);
+    const profitInr = Math.max(0, valueInr - costInr);
 
     card.innerHTML = `
       <div>
@@ -1092,7 +1257,7 @@ function renderScanResults(data, imageSrc) {
             ${rec.difficulty || 'Easy'} • ${rec.estimated_time_mins || 15} mins
           </span>
           <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200">
-            +$${profit} Est. ROI
+            +₹${profitInr} Est. Value
           </span>
         </div>
 
@@ -1102,11 +1267,11 @@ function renderScanResults(data, imageSrc) {
         <div class="mt-3 p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs">
           <div>
             <span class="text-slate-600 block">Est. Cost:</span>
-            <span class="font-bold text-slate-800">$${(rec.estimated_cost_usd || 0).toFixed(2)}</span>
+            <span class="font-bold text-slate-800">₹${costInr}</span>
           </div>
           <div class="text-right">
             <span class="text-slate-600 block">Market Value:</span>
-            <span class="font-extrabold text-emerald-600">$${(rec.potential_value_usd || 5).toFixed(2)}</span>
+            <span class="font-extrabold text-emerald-600">₹${valueInr}</span>
           </div>
         </div>
 
@@ -1196,27 +1361,270 @@ function loadSamplePreset(type) {
   }, 350);
 }
 
-// ================= DASHBOARD & CHARTS =================
+// ================= DASHBOARD & CHARTS (REAL USER VS DEMO DATA) =================
+function toggleDashboardScope() {
+  state.dashboardScope = state.dashboardScope === 'personal' ? 'global' : 'personal';
+  const badge = document.getElementById('dash-mode-badge');
+  const toggleBtn = document.getElementById('dash-mode-toggle');
+
+  if (state.dashboardScope === 'personal') {
+    if (badge) {
+      badge.textContent = state.language === 'ta' ? 'உங்கள் நேரடி செயல்பாடு' : 'Your Actual Activity';
+      badge.className = 'px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-emerald-100 text-emerald-800 border border-emerald-300';
+    }
+    if (toggleBtn) {
+      toggleBtn.textContent = state.language === 'ta' ? 'மாதிரித் தரவிற்கு மாறு' : 'Switch to Global Demo';
+    }
+  } else {
+    if (badge) {
+      badge.textContent = state.language === 'ta' ? 'மாதிரித் தரவு (Demo Mode)' : 'Viewing Global Demo Data';
+      badge.className = 'px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-amber-100 text-amber-800 border border-amber-300';
+    }
+    if (toggleBtn) {
+      toggleBtn.textContent = state.language === 'ta' ? 'எனது நேரடி செயல்பாட்டிற்கு மாறு' : 'Switch to My Actual Activity';
+    }
+  }
+
+  fetchDashboardStats();
+}
+
 async function fetchDashboardStats() {
   try {
-    const res = await fetch(`/api/dashboard/stats?session_id=${state.sessionId}&scope=global`);
+    const scopeParam = state.dashboardScope;
+    const res = await fetch(`/api/dashboard/stats?session_id=${state.sessionId}&scope=${scopeParam}`);
     if (!res.ok) return;
     const stats = await res.json();
 
-    document.getElementById('dash-total-scans').textContent = stats.total_scans || 0;
-    document.getElementById('dash-total-co2').textContent = `${(stats.total_co2_kg || 0).toFixed(2)} kg`;
-    document.getElementById('dash-total-landfill').textContent = `${(stats.total_landfill_kg || 0).toFixed(2)} kg`;
-    document.getElementById('dash-total-wealth').textContent = `$${(stats.total_wealth_potential_usd || 0).toFixed(2)}`;
+    // 1. Total waste identified
+    const scansElem = document.getElementById('dash-total-scans');
+    if (scansElem) scansElem.textContent = stats.total_scans || 0;
+
+    // 2. Total material weight
+    const weightElem = document.getElementById('dash-total-weight');
+    const weightSub = document.getElementById('dash-total-weight-sub');
+    if (weightElem) weightElem.textContent = `${(stats.total_material_weight_kg || stats.total_landfill_kg || 0).toFixed(2)} kg`;
+    if (weightSub) weightSub.textContent = `${Math.round((stats.total_material_weight_kg || stats.total_landfill_kg || 0) * 1000)} g total`;
+
+    // 3. Environmental metrics
+    const co2Elem = document.getElementById('dash-total-co2');
+    if (co2Elem) co2Elem.textContent = `${(stats.total_co2_kg || 0).toFixed(2)} kg`;
+
+    const landElem = document.getElementById('dash-total-landfill');
+    if (landElem) landElem.textContent = `${(stats.total_landfill_kg || 0).toFixed(2)} kg`;
+
+    const energyElem = document.getElementById('dash-total-energy');
+    if (energyElem) energyElem.textContent = `${(stats.total_energy_kwh || 0).toFixed(2)} kWh`;
+
+    // 4. Indian Scrap value (₹ INR)
+    const wealthElem = document.getElementById('dash-total-wealth');
+    if (wealthElem) wealthElem.textContent = `₹${(stats.total_economic_inr || 0).toFixed(2)}`;
+
+    // 5. Empty State Alert (Only if user has zero personal scans)
+    const emptyState = document.getElementById('dash-empty-state');
+    if (emptyState) {
+      if (state.dashboardScope === 'personal' && stats.total_scans === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
 
     // Equivalency calculation
     const co2 = stats.total_co2_kg || 0;
-    document.getElementById('equiv-trees').textContent = (co2 / 0.85).toFixed(1);
-    document.getElementById('equiv-miles').textContent = (co2 * 2.5).toFixed(1);
-    document.getElementById('equiv-led').textContent = Math.round(co2 * 120);
+    const trees = document.getElementById('equiv-trees');
+    const miles = document.getElementById('equiv-miles');
+    const led = document.getElementById('equiv-led');
+    if (trees) trees.textContent = (co2 / 0.85).toFixed(1);
+    if (miles) miles.textContent = (co2 * 2.5).toFixed(1);
+    if (led) led.textContent = Math.round(co2 * 120);
 
     renderMaterialDonutChart(stats.material_breakdown || []);
   } catch (err) {
     console.error('Dashboard fetch error:', err);
+  }
+}
+
+// ================= RECYCLING CENTRES DISCOVERY =================
+async function fetchRecyclingCentres() {
+  const city = document.getElementById('centre-city-filter') ? document.getElementById('centre-city-filter').value : '';
+  const stream = document.getElementById('centre-stream-filter') ? document.getElementById('centre-stream-filter').value : '';
+  const q = document.getElementById('centre-search-input') ? document.getElementById('centre-search-input').value.trim() : '';
+
+  try {
+    const url = `/api/centres?city=${encodeURIComponent(city)}&stream=${encodeURIComponent(stream)}&q=${encodeURIComponent(q)}`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    state.centresList = data.centres || [];
+    renderRecyclingCentres(state.centresList);
+  } catch (err) {
+    console.error('Error fetching recycling centres:', err);
+  }
+}
+
+function filterRecyclingCentres() {
+  fetchRecyclingCentres();
+}
+
+function renderRecyclingCentres(centres) {
+  const grid = document.getElementById('centres-directory-grid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  if (!centres || centres.length === 0) {
+    grid.innerHTML = `
+      <div class="col-span-full p-8 text-center bg-white rounded-2xl border border-slate-200 space-y-2">
+        <i data-lucide="map-pin-off" class="w-8 h-8 text-slate-400 mx-auto"></i>
+        <div class="font-bold text-slate-700 text-sm">No authorized recovery centers found matching your filter.</div>
+        <div class="text-xs text-slate-500">Try selecting another city or waste stream category.</div>
+      </div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+    return;
+  }
+
+  centres.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4';
+
+    const streamsPills = (c.accepted_streams || []).map(s => {
+      if (s === 'dry') return '<span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-100 text-blue-800 border border-blue-200">Dry Waste</span>';
+      if (s === 'wet') return '<span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">Wet Waste</span>';
+      return '<span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-100 text-purple-800 border border-purple-200">Special-Care / E-Waste</span>';
+    }).join(' ');
+
+    const materialsList = (c.materials || []).map(m => `<span class="px-2 py-0.5 rounded-md text-[11px] bg-slate-100 text-slate-700">${m}</span>`).join(' ');
+
+    card.innerHTML = `
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-bold text-eco-700 flex items-center gap-1">
+            <i data-lucide="building" class="w-3.5 h-3.5"></i>
+            ${c.city}, ${c.state}
+          </span>
+          <div class="flex gap-1">${streamsPills}</div>
+        </div>
+
+        <h4 class="font-bold text-base text-slate-900 leading-snug">${c.name}</h4>
+        <p class="text-xs text-slate-500 flex items-start gap-1.5">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5"></i>
+          <span>${c.address}</span>
+        </p>
+
+        <p class="text-xs text-slate-600 leading-relaxed">${c.description}</p>
+
+        <div class="pt-1">
+          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1.5">Accepted Materials:</div>
+          <div class="flex flex-wrap gap-1">${materialsList}</div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+        <span class="text-slate-500 text-[11px]">🕒 ${c.operating_hours}</span>
+        <div class="flex items-center gap-2">
+          ${c.contact_phone ? `<a href="tel:${c.contact_phone}" class="px-2.5 py-1 bg-eco-50 hover:bg-eco-100 text-eco-800 rounded-lg transition flex items-center gap-1"><i data-lucide="phone" class="w-3 h-3"></i> Call</a>` : ''}
+          ${c.website ? `<a href="${c.website}" target="_blank" rel="noopener" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg transition flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Info</a>` : ''}
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+// ================= BILINGUAL LOCALIZATION (TAMIL / ENGLISH) =================
+function setAppLanguage(lang) {
+  state.language = lang === 'ta' ? 'ta' : 'en';
+  localStorage.setItem('ecotransform_lang', state.language);
+
+  // Update switcher buttons UI
+  const btnEn = document.getElementById('lang-btn-en');
+  const btnTa = document.getElementById('lang-btn-ta');
+  if (btnEn && btnTa) {
+    if (state.language === 'ta') {
+      btnTa.className = 'px-2 py-1 rounded-lg transition bg-white text-eco-700 shadow-xs font-black';
+      btnEn.className = 'px-2 py-1 rounded-lg transition text-slate-600 hover:text-slate-900 font-normal';
+    } else {
+      btnEn.className = 'px-2 py-1 rounded-lg transition bg-white text-eco-700 shadow-xs font-black';
+      btnTa.className = 'px-2 py-1 rounded-lg transition text-slate-600 hover:text-slate-900 font-normal';
+    }
+  }
+
+  applyTranslations();
+}
+
+function applyTranslations() {
+  if (typeof TRANSLATIONS === 'undefined') return;
+  const t = TRANSLATIONS[state.language] || TRANSLATIONS.en;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) {
+      el.textContent = t[key];
+    }
+  });
+
+  // Also update placeholders
+  const descInput = document.getElementById('waste-description-input');
+  if (descInput && t.desc_placeholder) descInput.placeholder = t.desc_placeholder;
+
+  const barInput = document.getElementById('barcode-input-field');
+  if (barInput && t.barcode_placeholder) barInput.placeholder = t.barcode_placeholder;
+
+  // Refresh current scan view with localized stream title if open
+  if (state.currentScanData) {
+    renderIndianWasteStream(state.currentScanData);
+  }
+}
+
+// Helper: Renders Indian SWM 2016 Stream Card
+function renderIndianWasteStream(data) {
+  const streamCard = document.getElementById('swm-stream-card');
+  if (!streamCard) return;
+
+  const analysis = data.waste_analysis || {};
+  const stream = data.indian_waste_stream || analysis.indian_waste_stream;
+  if (!stream) {
+    streamCard.classList.add('hidden');
+    return;
+  }
+
+  streamCard.classList.remove('hidden');
+  const streamPill = document.getElementById('swm-stream-pill');
+  const streamTitle = document.getElementById('swm-stream-title');
+  const binBadge = document.getElementById('swm-bin-badge');
+  const binName = document.getElementById('swm-bin-name');
+  const guidanceEn = document.getElementById('swm-guidance-en');
+  const guidanceTa = document.getElementById('swm-guidance-ta');
+  const iconBox = document.getElementById('swm-bin-icon-box');
+
+  const isTa = state.language === 'ta';
+  if (streamPill) streamPill.textContent = isTa ? stream.stream_name_ta : stream.stream_name;
+  if (streamTitle) streamTitle.textContent = `${stream.stream_name_ta} / ${stream.stream_name}`;
+  if (binName) binName.textContent = isTa ? stream.bin_color_ta : stream.bin_color;
+  if (guidanceEn) guidanceEn.textContent = stream.guidance_en;
+  if (guidanceTa) guidanceTa.textContent = stream.guidance_ta;
+
+  // Color theme dynamically based on stream
+  const code = stream.stream_code;
+  if (code === 'wet') {
+    streamCard.className = 'bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white p-5 rounded-2xl shadow-sm border border-emerald-700/50 space-y-3';
+    if (binBadge) binBadge.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-emerald-600 text-white flex items-center gap-1.5 shadow-xs';
+    if (iconBox) iconBox.className = 'w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center border border-emerald-400/30';
+  } else if (code === 'sanitary') {
+    streamCard.className = 'bg-gradient-to-r from-rose-950 via-red-900 to-slate-900 text-white p-5 rounded-2xl shadow-sm border border-rose-700/50 space-y-3';
+    if (binBadge) binBadge.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-rose-600 text-white flex items-center gap-1.5 shadow-xs';
+    if (iconBox) iconBox.className = 'w-9 h-9 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center border border-rose-400/30';
+  } else if (code === 'special-care') {
+    streamCard.className = 'bg-gradient-to-r from-purple-950 via-slate-900 to-black text-white p-5 rounded-2xl shadow-sm border border-purple-700/50 space-y-3';
+    if (binBadge) binBadge.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-1.5 shadow-xs';
+    if (iconBox) iconBox.className = 'w-9 h-9 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center border border-purple-400/30';
+  } else {
+    streamCard.className = 'bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-5 rounded-2xl shadow-sm border border-blue-700/50 space-y-3';
+    if (binBadge) binBadge.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-blue-600 text-white flex items-center gap-1.5 shadow-xs';
+    if (iconBox) iconBox.className = 'w-9 h-9 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center border border-blue-400/30';
   }
 }
 

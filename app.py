@@ -17,6 +17,7 @@ from gemini_service import analyze_waste_image, analyze_waste_text, check_text_c
 from impact_calculator import calculate_environmental_impact
 from barcode_service import lookup_barcode_product, VERIFIED_PRODUCT_CATALOG
 from intelligence_engine import fuse_evidence
+from centers_service import search_recycling_centres, VERIFIED_RECYCLING_CENTRES
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 6MB limit
@@ -322,6 +323,73 @@ def delete_scan_record(scan_id):
     if not success:
         return jsonify({"error": "Unable to delete scan record"}), 400
     return jsonify({"success": True, "message": "Scan deleted successfully"})
+
+@app.route("/api/impact/recalculate", methods=["POST", "OPTIONS"])
+def recalculate_impact():
+    """
+    Recalculates environmental & economic impact when user edits weight or switches scenario.
+    Optionally persists confirmed weight and updated metrics to database if scan_id provided.
+    """
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    data = request.get_json(silent=True) or {}
+    item_name = data.get("item_name", "Waste Item")
+    primary_material = data.get("primary_material", "Plastic")
+    raw_weight = data.get("weight")
+    unit = str(data.get("unit", "kg")).lower().strip()
+    scenario = str(data.get("scenario", "recycling")).lower().strip()
+    is_user_confirmed = bool(data.get("is_user_confirmed", True))
+    scan_id = data.get("scan_id")
+
+    # Validate weight input
+    try:
+        weight_val = float(raw_weight)
+        if weight_val <= 0:
+            return jsonify({
+                "error_code": "INVALID_WEIGHT",
+                "message": "Weight must be greater than zero."
+            }), 400
+        
+        # Convert grams to kilograms if specified
+        weight_kg = weight_val / 1000.0 if unit == "g" else weight_val
+    except (TypeError, ValueError):
+        return jsonify({
+            "error_code": "INVALID_WEIGHT_FORMAT",
+            "message": "Please enter a valid numeric weight."
+        }), 400
+
+    # Calculate updated metrics
+    impact = calculate_environmental_impact(
+        item_name=item_name,
+        primary_material=primary_material,
+        detected_weight_kg=weight_kg,
+        scenario=scenario,
+        is_user_confirmed=is_user_confirmed,
+        unit=unit
+    )
+
+    # Persist in database if scan_id is provided
+    if scan_id:
+        db.update_scan_weight_and_impact(scan_id, impact)
+
+    return jsonify(impact), 200
+
+@app.route("/api/centres", methods=["GET"])
+def recycling_centres():
+    """
+    Returns verified municipal and authorized recycling & material recovery centres.
+    Supports filtering by city (e.g. Chennai, Bengaluru, Mumbai), stream, and query.
+    """
+    city = request.args.get("city", "")
+    stream = request.args.get("stream", "")
+    q = request.args.get("q", "")
+    centres = search_recycling_centres(city=city, stream=stream, query=q)
+    return jsonify({
+        "total": len(centres),
+        "centres": centres,
+        "supported_cities": ["Chennai", "Coimbatore", "Madurai", "Bengaluru", "Mumbai", "New Delhi", "Hyderabad"]
+    }), 200
 
 @app.route("/api/dashboard/stats", methods=["GET"])
 def dashboard_stats():
