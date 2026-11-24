@@ -676,6 +676,499 @@ FALLBACK_ARCHETYPES = {
                 "sustainability_benefit": "Harvests precision mechanical subcomponents for STEM education."
             }
         ]
+    },
+    "pet": {
+        "item_name": "PET Plastic Bottle (#1)",
+        "primary_material": "Polyethylene Terephthalate (PET, #1)",
+        "physical_condition": "Rigid transparent thermoplastic bottle",
+        "confidence_score": 0.98,
+        "categories": ["Recyclable", "Reusable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Resin code #1 (PETE/PET), high clarity, molded base gate mark, widely recycled globally and across Indian MRFs.",
+        "disposal_recommendation": "Empty contents, rinse clean, crush to conserve volume, replace screw cap, and place into Dry Recyclables Blue Bin.",
+        "estimated_weight_kg": 0.035,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Self-Watering Sub-Irrigated Seedling Planter",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 6.00,
+                "materials_needed": ["PET bottle", "Cotton wick string", "Potting soil", "Seeds"],
+                "tools_needed": ["Scissors or utility knife"],
+                "safety_precautions": ["Cut slowly; smooth cut plastic edges with sandpaper."],
+                "steps": [
+                    "Cut the PET bottle in half horizontally.",
+                    "Invert top half into bottom base reservoir.",
+                    "Thread cotton wick through the neck opening.",
+                    "Add soil and seeds; fill bottom reservoir with water."
+                ],
+                "sustainability_benefit": "Diverts clear single-use PET bottles into long-term domestic gardening tools."
+            },
+            {
+                "product_name": "Modular Drawer Cable Organizer Tubes",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 5.00,
+                "materials_needed": ["2-3 PET bottles", "Masking or washi tape"],
+                "tools_needed": ["Craft knife"],
+                "safety_precautions": ["Cover cut rims with tape to prevent sharp edges."],
+                "steps": [
+                    "Cut off top conical necks to create straight cylindrical sleeves.",
+                    "Tape cut rims for a smooth edge.",
+                    "Bundle USB cables and slip inside cylinders to keep drawers neat."
+                ],
+                "sustainability_benefit": "Replaces virgin plastic organizer trays with upcycled bottle cylinders."
+            },
+            {
+                "product_name": "Bird Feeder Seed Dispenser",
+                "difficulty": "Easy",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 1.00,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["1L PET bottle", "Two wooden spoons", "Twine", "Birdseed"],
+                "tools_needed": ["Craft knife"],
+                "safety_precautions": ["Make small clean incisions without cracking bottle walls."],
+                "steps": [
+                    "Pierce two sets of holes across bottle walls and pass wooden spoons through.",
+                    "Enlarge feed holes slightly above each spoon bowl.",
+                    "Fill with birdseed, replace cap, and hang with twine outdoors."
+                ],
+                "sustainability_benefit": "Enriches urban wildlife biodiversity while reusing sturdy PET containers."
+            }
+        ]
+    },
+    "hdpe": {
+        "item_name": "HDPE Jug / Container (#2)",
+        "primary_material": "High-Density Polyethylene (HDPE #2)",
+        "physical_condition": "Opaque, rigid, durable chemical-resistant container",
+        "confidence_score": 0.96,
+        "categories": ["Recyclable", "Reusable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Resin code #2 (HDPE), translucent to opaque coloring, smooth uncracking walls, distinct base mold seam.",
+        "disposal_recommendation": "Rinse thoroughly to remove detergent or milk residues. Keep cap on and deposit into Dry Waste Blue Bin.",
+        "estimated_weight_kg": 0.065,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Ergonomic Garden Soil Scoop / Dustpan",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 7.00,
+                "materials_needed": ["HDPE milk or detergent jug with handle"],
+                "tools_needed": ["Heavy-duty shears or craft knife", "Marker"],
+                "safety_precautions": ["Wash out detergent remnants thoroughly before cutting."],
+                "steps": [
+                    "Trace an angled diagonal line from base to handle on both sides.",
+                    "Cut along line preserving handle and bottom scoop.",
+                    "Sand edges smooth for a durable compost or soil scoop."
+                ],
+                "sustainability_benefit": "Converts heavy gauge HDPE into a permanent garden hand tool."
+            },
+            {
+                "product_name": "Heavy-Duty Workshop Fastener Sorting Bins",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 5.00,
+                "materials_needed": ["2-4 HDPE bottles or jugs"],
+                "tools_needed": ["Utility knife"],
+                "safety_precautions": ["Smooth cut rims."],
+                "steps": [
+                    "Cut jug tops off at 10cm height.",
+                    "Label bins for nails, screws, washers, and bolts.",
+                    "Stack or line up on workshop shelves."
+                ],
+                "sustainability_benefit": "Replaces purchased injection-molded garage organizers."
+            },
+            {
+                "product_name": "Weatherproof Plant Identification Markers",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 4.00,
+                "materials_needed": ["Flat panels cut from HDPE jugs", "Permanent marker"],
+                "tools_needed": ["Scissors"],
+                "safety_precautions": ["Watch fingers when shearing stiff plastic."],
+                "steps": [
+                    "Cut flat rectangular strips (2x12cm) with pointed bottom tips.",
+                    "Write plant names with waterproof permanent marker.",
+                    "Insert into garden beds or plant nursery pots."
+                ],
+                "sustainability_benefit": "Weatherproof markers that never rot or degrade in rain and sun."
+            }
+        ]
+    },
+    "pvc": {
+        "item_name": "PVC Plastic Scrap (#3)",
+        "primary_material": "Polyvinyl Chloride (PVC #3)",
+        "physical_condition": "Rigid or semi-flexible chlorinated vinyl polymer",
+        "confidence_score": 0.94,
+        "categories": ["Recyclable", "Specialized Disposal"],
+        "is_hazardous": False,
+        "identification_reasoning": "Resin code #3 (PVC/V), dense feel, rigid pipe or blister formation. Requires dedicated recycling stream.",
+        "disposal_recommendation": "Do NOT incinerate or place with general plastics. Hand over to specialized construction plastic recyclers or scrap dealers.",
+        "estimated_weight_kg": 0.120,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Vertical Hydroponic Tower / Herb Column",
+                "difficulty": "Medium",
+                "estimated_time_mins": 45,
+                "estimated_cost_usd": 2.00,
+                "potential_value_usd": 25.00,
+                "materials_needed": ["PVC pipe offcut (3-4 inch)", "Net cups or mesh"],
+                "tools_needed": ["Hole saw or heat gun", "Drill"],
+                "safety_precautions": ["Work in open ventilated area when heating PVC; wear safety glasses."],
+                "steps": [
+                    "Mark planting cup locations in alternating spiral pattern.",
+                    "Heat slots gently with heat gun and press inward with a glass bottle to form cups.",
+                    "Cap base, insert irrigation tubing, and mount vertically for leafy greens."
+                ],
+                "sustainability_benefit": "Reuses indestructible PVC plumbing offcuts for space-saving food cultivation."
+            },
+            {
+                "product_name": "Tool & Paint Brush Wall Holsters",
+                "difficulty": "Easy",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["Short PVC pipe segments", "Wood backing board", "Screws"],
+                "tools_needed": ["Hand saw", "Drill"],
+                "safety_precautions": ["Secure pipe in vise before cutting."],
+                "steps": [
+                    "Cut PVC pipe into 8cm angled segments.",
+                    "Drill pilot holes through one wall.",
+                    "Screw onto wooden board to hold chisels, pliers, and paintbrushes."
+                ],
+                "sustainability_benefit": "Prevents PVC pipe scraps from entering municipal landfills."
+            },
+            {
+                "product_name": "Garden Hose & Cord Wall Reel",
+                "difficulty": "Easy",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 1.00,
+                "potential_value_usd": 10.00,
+                "materials_needed": ["Large diameter PVC pipe section", "Mounting bracket"],
+                "tools_needed": ["Drill", "Screws"],
+                "safety_precautions": ["Mount securely to wall studs."],
+                "steps": [
+                    "Cut 20cm cylindrical pipe segment.",
+                    "Fasten horizontally against wall at eye level.",
+                    "Loop garden hose or extension cords over curved upper surface."
+                ],
+                "sustainability_benefit": "Durable, non-corrosive outdoor organizer that lasts decades."
+            }
+        ]
+    },
+    "ldpe": {
+        "item_name": "LDPE Film & Flexible Packaging (#4)",
+        "primary_material": "Low-Density Polyethylene (LDPE #4)",
+        "physical_condition": "Flexible, ductile thermoplastic film / pouch",
+        "confidence_score": 0.95,
+        "categories": ["Recyclable", "Reusable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Resin code #4 (LDPE), stretches without crinkling loudly, soft tactile touch, translucent.",
+        "disposal_recommendation": "Bundle multiple clean, dry LDPE bags inside a single bag before placing in plastic film recycling collection.",
+        "estimated_weight_kg": 0.020,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Fused Plastic 'Plarn' Heavy-Duty Tote Bag",
+                "difficulty": "Medium",
+                "estimated_time_mins": 40,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 12.00,
+                "materials_needed": ["10-15 clean LDPE grocery bags", "Parchment paper"],
+                "tools_needed": ["Clothes iron", "Ironing board", "Scissors"],
+                "safety_precautions": ["Always iron between parchment paper sheets; never touch iron directly to plastic."],
+                "steps": [
+                    "Cut handles and bottom seams off bags and lay flat.",
+                    "Layer 6-8 bags together sandwiched between parchment paper.",
+                    "Iron on medium heat until layers fuse into a leather-like waterproof sheet.",
+                    "Stitch or fuse sheets into a durable shopping tote."
+                ],
+                "sustainability_benefit": "Permanently upcycles flimsy single-use film into a multi-year reusable tote."
+            },
+            {
+                "product_name": "Crocheted Plastic Yarn (Plarn) Floor Mat / Coasters",
+                "difficulty": "Medium",
+                "estimated_time_mins": 60,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 15.00,
+                "materials_needed": ["20+ LDPE plastic shopping bags"],
+                "tools_needed": ["Large crochet hook (size 10-12mm)", "Scissors"],
+                "safety_precautions": ["Work in good light to avoid eye fatigue."],
+                "steps": [
+                    "Fold bags flat and slice into 3cm wide loops.",
+                    "Loop strips together to form continuous 'plarn' balls.",
+                    "Crochet into waterproof, washable bathroom mats or outdoor seat cushions."
+                ],
+                "sustainability_benefit": "Diverts high-volume lightweight film from street litter and storm drains."
+            },
+            {
+                "product_name": "Insulating Outdoor Plant / Pot Freeze Wrap",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 5.00,
+                "materials_needed": ["LDPE bubble mailers or bubble wrap", "Twine or clips"],
+                "tools_needed": ["Scissors"],
+                "safety_precautions": ["Ensure plants can breathe during daytime."],
+                "steps": [
+                    "Wrap clean LDPE bubble layers around plant pots.",
+                    "Fasten securely with twine to protect tender roots from cold temperature swings."
+                ],
+                "sustainability_benefit": "Extends life of packaging cushioning while protecting domestic plants."
+            }
+        ]
+    },
+    "pp": {
+        "item_name": "Polypropylene Packaging / Tub (#5)",
+        "primary_material": "Polypropylene (PP, #5)",
+        "physical_condition": "Semi-rigid, fatigue-resistant heat-tolerant polymer",
+        "confidence_score": 0.96,
+        "categories": ["Recyclable", "Reusable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Resin code #5 (PP), high melting point, fatigue-resistant living hinges (pill bottles, food tubs, bottle caps).",
+        "disposal_recommendation": "Rinse thoroughly to eliminate food/oil residue, dry, and place into Dry Recyclables Blue Bin.",
+        "estimated_weight_kg": 0.040,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Stackable Hardware & Craft Organizer Cups",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 6.00,
+                "materials_needed": ["Clean PP yogurt / butter tubs with snap lids"],
+                "tools_needed": ["Label maker or marker"],
+                "safety_precautions": ["Wash thoroughly with warm soapy water."],
+                "steps": [
+                    "Wash, dry, and remove paper wrap labels.",
+                    "Label lids for craft beads, buttons, rubber bands, or safety pins.",
+                    "Stack compactly in storage cubbies."
+                ],
+                "sustainability_benefit": "Durable PP food containers replace commercial plastic storage containers."
+            },
+            {
+                "product_name": "Mosaic Bottle-Cap Trivet / Coaster Set",
+                "difficulty": "Easy",
+                "estimated_time_mins": 25,
+                "estimated_cost_usd": 1.00,
+                "potential_value_usd": 9.00,
+                "materials_needed": ["20-30 colored PP screw caps", "Cork backing or hot glue"],
+                "tools_needed": ["Glue gun"],
+                "safety_precautions": ["Hot glue is hot; supervise carefully."],
+                "steps": [
+                    "Sort PP caps by color to form radial geometric patterns.",
+                    "Glue caps tightly side-by-side onto a cork or cardboard backing.",
+                    "Use as heat-resistant hot pot trivets or drink coasters."
+                ],
+                "sustainability_benefit": "Captures small caps that frequently escape municipal sorting screens."
+            },
+            {
+                "product_name": "Mini Greenhouse Seedling Cloche",
+                "difficulty": "Easy",
+                "estimated_time_mins": 5,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 4.00,
+                "materials_needed": ["Translucent PP take-away containers with lids"],
+                "tools_needed": ["Push pin or small nail"],
+                "safety_precautions": ["Pierce holes carefully away from hands."],
+                "steps": [
+                    "Pinch 3-4 ventilation pinholes through container lid.",
+                    "Add seed starter mix to bottom and mist with water.",
+                    "Snap lid on to create high-humidity germination dome."
+                ],
+                "sustainability_benefit": "Accelerates home seedling germination with zero new plastic purchase."
+            }
+        ]
+    },
+    "ps": {
+        "item_name": "Polystyrene Packaging / Foam Clamshell (#6)",
+        "primary_material": "Polystyrene (PS, #6)",
+        "physical_condition": "Rigid brittle or expanded cellular foam (Styrofoam)",
+        "confidence_score": 0.93,
+        "categories": ["Recyclable", "Non-Biodegradable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Resin code #6 (PS), lightweight cellular expanded foam or brittle clear hard plastic (cutlery, CD jewel cases).",
+        "disposal_recommendation": "Check municipal facilities for EPS drop-off; do not burn. Hand over to specialized dense-foam densifiers.",
+        "estimated_weight_kg": 0.015,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Lightweight Plant Pot Drainage Filler",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 5.00,
+                "materials_needed": ["Clean expanded polystyrene (Styrofoam) pieces"],
+                "tools_needed": ["Hands"],
+                "safety_precautions": ["Break foam inside a container to prevent static beads flying around."],
+                "steps": [
+                    "Break clean foam blocks into 2-3cm chunks.",
+                    "Fill bottom third of large outdoor planter pots before adding soil.",
+                    "Provides superior drainage and reduces total planter weight by 60%."
+                ],
+                "sustainability_benefit": "Replaces heavy rocks/gravel and keeps EPS packaging out of landfills."
+            },
+            {
+                "product_name": "Cold-Chain Thermal Food & Vaccine Cooler Box",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 10.00,
+                "materials_needed": ["Molded EPS foam shipping cooler", "Ice packs or frozen bottles"],
+                "tools_needed": ["Tape"],
+                "safety_precautions": ["Check for cracks; seal with duct tape."],
+                "steps": [
+                    "Inspect foam cooler for structural integrity.",
+                    "Reinforce outer corners with duct tape.",
+                    "Use for groceries, outdoor picnics, or temperature-sensitive medicine transit."
+                ],
+                "sustainability_benefit": "Avoids purchasing commercial polyurethane camping coolers."
+            },
+            {
+                "product_name": "DIY Acoustic Studio Absorption Tiles",
+                "difficulty": "Medium",
+                "estimated_time_mins": 35,
+                "estimated_cost_usd": 2.00,
+                "potential_value_usd": 18.00,
+                "materials_needed": ["Flat EPS foam sheets", "Scrap cotton or burlap fabric", "Spray adhesive"],
+                "tools_needed": ["Utility knife", "Ruler"],
+                "safety_precautions": ["Use spray adhesive in well-ventilated area."],
+                "steps": [
+                    "Cut foam sheets into 30x30cm squares.",
+                    "Spray adhesive and wrap tightly in natural textured fabric.",
+                    "Mount on home office or recording space walls for sound dampening."
+                ],
+                "sustainability_benefit": "Replaces synthetic acoustic foam tiles with upcycled packaging."
+            }
+        ]
+    },
+    "paper": {
+        "item_name": "Office Paper & Newsprint Discards",
+        "primary_material": "Cellulose Wood Fibre (Paper & Newsprint)",
+        "physical_condition": "Dry, clean, uncoated cellulose sheets",
+        "confidence_score": 0.98,
+        "categories": ["Recyclable", "Biodegradable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Thin cellulose sheet structure, uncoated pulp surface, clean tear fibers. High recovery yield in Indian paper mills.",
+        "disposal_recommendation": "Keep dry and unsoiled. Bundle newspapers and office sheets with jute twine and hand over to Kabadiwala or Dry Waste bin.",
+        "estimated_weight_kg": 0.050,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Handmade Recycled Botanical Seed Paper",
+                "difficulty": "Medium",
+                "estimated_time_mins": 45,
+                "estimated_cost_usd": 1.00,
+                "potential_value_usd": 15.00,
+                "materials_needed": ["Shredded scrap paper", "Water", "Wildflower seeds", "Deckle/screen"],
+                "tools_needed": ["Blender or hand whisk", "Mesh screen frame", "Sponge", "Towel"],
+                "safety_precautions": ["Blender blades are sharp; operate with lid securely closed."],
+                "steps": [
+                    "Tear scrap paper into small pieces and soak in warm water for 2 hours.",
+                    "Blend pulp until smooth; gently stir in flower seeds.",
+                    "Scoop slurry with mesh screen, press out moisture with sponge, and air dry.",
+                    "Cut into greeting cards that sprout into flowers when planted."
+                ],
+                "sustainability_benefit": "Transforms discarded office paper into 100% plantable biodiversity stationery."
+            },
+            {
+                "product_name": "Compressed Paper Fireplace Briquettes",
+                "difficulty": "Easy",
+                "estimated_time_mins": 30,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["Old newspapers and junk mail", "Water"],
+                "tools_needed": ["Bucket", "Perforated briquette press or tin can mold"],
+                "safety_precautions": ["Burn only in properly ventilated fireplaces or outdoor stoves."],
+                "steps": [
+                    "Shred newspapers and soak in bucket for 24-48 hours until fibrous pulp.",
+                    "Compress pulp into brick molds squeezing out excess water.",
+                    "Allow to sun-dry for 5-7 days until rock hard.",
+                    "Burns clean with high thermal efficiency as firewood alternative."
+                ],
+                "sustainability_benefit": "Replaces harvested wood logs with zero-cost carbon-neutral heating."
+            },
+            {
+                "product_name": "Origami Biodegradable Seed Starter Pots",
+                "difficulty": "Easy",
+                "estimated_time_mins": 10,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 5.00,
+                "materials_needed": ["Newspaper sheets", "Glass or can for shaping"],
+                "tools_needed": ["Hands"],
+                "safety_precautions": ["None."],
+                "steps": [
+                    "Fold a sheet of newspaper in half lengthwise.",
+                    "Roll around a small glass, leaving 3cm overhang at the bottom.",
+                    "Fold overhang inwards into base, remove glass, and fill with seedling soil.",
+                    "Plant entire pot directly into soil when seedling matures — paper naturally composts."
+                ],
+                "sustainability_benefit": "Eliminates plastic nursery seedling trays with 100% compostable paper."
+            }
+        ]
+    },
+    "steel": {
+        "item_name": "Steel / Tinplate Food Can",
+        "primary_material": "Tin-Coated Mild Steel (Tinplate)",
+        "physical_condition": "Magnetic ferrous metal cylindrical can",
+        "confidence_score": 0.97,
+        "categories": ["Recyclable", "Reusable"],
+        "is_hazardous": False,
+        "identification_reasoning": "Ferrous magnetic attraction, distinct ribbed structural sidewalls, rolled top rim. Indefinitely recyclable without degradation.",
+        "disposal_recommendation": "Rinse clean, press lid inside the can to prevent animal or handler injury, and deposit in Dry Waste Metals Bin.",
+        "estimated_weight_kg": 0.055,
+        "upcycle_recommendations": [
+            {
+                "product_name": "Punched Tin Decorative Ambient Lantern",
+                "difficulty": "Easy",
+                "estimated_time_mins": 25,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 12.00,
+                "materials_needed": ["Clean steel food can", "LED tealight or candle", "Wire for handle"],
+                "tools_needed": ["Nail or hammer", "Water (freeze inside can first)"],
+                "safety_precautions": ["Fill can with water and freeze solid before punching holes — prevents can from denting!"],
+                "steps": [
+                    "Fill clean can with water and freeze overnight.",
+                    "Draw pattern on paper and tape to frozen can.",
+                    "Punch holes along pattern using hammer and nail into the ice core.",
+                    "Melt ice, dry thoroughly, and insert tealight for stunning night lantern."
+                ],
+                "sustainability_benefit": "Turns industrial tin food packaging into bespoke artisanal lighting."
+            },
+            {
+                "product_name": "Magnetic Kitchen Spice & Herb Rack Canisters",
+                "difficulty": "Easy",
+                "estimated_time_mins": 20,
+                "estimated_cost_usd": 1.50,
+                "potential_value_usd": 15.00,
+                "materials_needed": ["Small shallow steel cans / tuna tins", "Neodymium craft magnets", "Labels"],
+                "tools_needed": ["Super glue or epoxy"],
+                "safety_precautions": ["Ensure cut lid edge is completely smooth."],
+                "steps": [
+                    "Wash and de-odorize tins thoroughly.",
+                    "Glue small magnet to center of tin base.",
+                    "Label sides and snap onto refrigerator or metal backsplash for spice storage."
+                ],
+                "sustainability_benefit": "Replaces plastic spice container sets using infinitely recyclable tinplate."
+            },
+            {
+                "product_name": "Desk Organizer Set with Twine Wrap Accent",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.50,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["3 cans of varying heights", "Jute twine or craft rope", "Hot glue"],
+                "tools_needed": ["Hot glue gun", "Scissors"],
+                "safety_precautions": ["Hot glue can burn; take care."],
+                "steps": [
+                    "Wrap cans tightly with jute twine from base to rim, securing with glue dots.",
+                    "Cluster the three cans together on a wooden coaster base.",
+                    "Use for pens, scissors, markers, and stylus storage."
+                ],
+                "sustainability_benefit": "Eliminates virgin plastic desk accessories with rustic upcycled metal storage."
+            }
+        ]
     }
 }
 
@@ -965,25 +1458,44 @@ def _generate_heuristic_text_analysis(description: str, material_hint: str = "")
     """Heuristic fallback for text and category descriptions."""
     text_corpus = f"{description} {material_hint}".lower()
 
-    selected_key = "plastic"
-    if any(k in text_corpus for k in ["battery", "cell", "hazard", "lithium", "duracell", "energizer", "aa", "aaa", "lead-acid"]):
+    # Prioritize explicit material_hint if passed directly from manual selection
+    hint_clean = material_hint.strip().lower()
+    if hint_clean in FALLBACK_ARCHETYPES:
+        selected_key = hint_clean
+    elif any(k in text_corpus for k in ["battery", "cell", "hazard", "lithium", "duracell", "energizer", "aa", "aaa", "lead-acid"]):
         selected_key = "battery"
     elif any(k in text_corpus for k in ["electronic", "phone", "laptop", "cable", "pcb", "charger", "gadget", "device", "motherboard", "computer"]):
         selected_key = "electronic"
     elif any(k in text_corpus for k in ["cloth", "clothes", "fabric", "textile", "shirt", "jeans", "denim", "cotton", "t-shirt", "garment"]):
         selected_key = "textile"
-    elif any(k in text_corpus for k in ["cardboard", "box", "package", "carton", "paper", "kraft"]):
+    elif any(k in text_corpus for k in ["steel", "tinplate", "iron", "food can", "aerosol"]):
+        selected_key = "steel"
+    elif any(k in text_corpus for k in ["cardboard", "corrugated", "kraft", "shipping box"]):
         selected_key = "cardboard"
+    elif any(k in text_corpus for k in ["paper", "newsprint", "office paper", "newspaper", "notebook"]):
+        selected_key = "paper"
     elif any(k in text_corpus for k in ["glass", "jar", "wine", "beer bottle", "pickle", "mason jar"]):
         selected_key = "glass"
     elif any(k in text_corpus for k in ["organic", "food", "compost", "veggie", "fruit", "peel", "banana", "coffee", "tea", "scrap", "apple", "leftover"]):
         selected_key = "organic"
-    elif any(k in text_corpus for k in ["can", "soda", "coke", "beer", "aluminum", "tin", "foil", "metal"]):
+    elif any(k in text_corpus for k in ["can", "soda", "coke", "beer", "aluminum", "tin", "foil"]):
         selected_key = "aluminum"
-    elif any(k in text_corpus for k in ["plastic", "bottle", "jug", "cup", "pet", "hdpe", "container", "poly", "wrapper", "bag"]):
+    elif any(k in text_corpus for k in ["pet", "water bottle", "soda bottle", "beverage bottle"]):
+        selected_key = "pet"
+    elif any(k in text_corpus for k in ["hdpe", "milk jug", "detergent jug"]):
+        selected_key = "hdpe"
+    elif any(k in text_corpus for k in ["ps", "polystyrene", "styrofoam", "eps"]):
+        selected_key = "ps"
+    elif any(k in text_corpus for k in ["polypropylene", "yogurt", "tub"]):
+        selected_key = "pp"
+    elif any(k in text_corpus for k in ["ldpe", "squeeze bottle", "plastic bag", "grocery bag", "wrap"]):
+        selected_key = "ldpe"
+    elif any(k in text_corpus for k in ["pvc", "vinyl", "blister"]):
+        selected_key = "pvc"
+    elif any(k in text_corpus for k in ["plastic", "bottle", "jug", "cup", "container", "poly", "wrapper", "bag"]):
         selected_key = "plastic"
-    elif material_hint and material_hint.lower() in FALLBACK_ARCHETYPES:
-        selected_key = material_hint.lower()
+    else:
+        selected_key = "plastic"
 
     template = FALLBACK_ARCHETYPES.get(selected_key, FALLBACK_ARCHETYPES["plastic"])
     

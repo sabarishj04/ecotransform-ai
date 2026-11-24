@@ -453,12 +453,29 @@
                 </label>
                 <select id="manual-material-select" class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 focus:border-eco-500 focus:ring-2 focus:ring-eco-500/20 outline-none transition bg-white" onchange="onManualCategoryChanged()">
                   <option value="">-- Choose Category --</option>
-                  <option value="Plastic">🧴 Plastic (PET #1, HDPE #2, Polypropylene)</option>
-                  <option value="Aluminum">🥫 Aluminum & Light Metals (Soda cans, foil)</option>
-                  <option value="Cardboard">📦 Cardboard & Kraft Paperboard</option>
-                  <option value="Glass">🍶 Glass Bottles & Food Jars</option>
-                  <option value="Organic">🌱 Organic Waste (Food scraps, peels, grounds)</option>
-                  <option value="Battery">🔋 Hazardous Batteries & E-Waste</option>
+                  <optgroup label="Plastics (Resin Identification Codes)">
+                    <option value="pet">🧴 PET #1 - Polyethylene Terephthalate (Water / Soda Bottles)</option>
+                    <option value="hdpe">🧴 HDPE #2 - High-Density Polyethylene (Milk Jugs, Shampoo Bottles)</option>
+                    <option value="pvc">🧪 PVC #3 - Polyvinyl Chloride (Pipes, Blister Packs)</option>
+                    <option value="ldpe">🛍️ LDPE #4 - Low-Density Polyethylene (Grocery Bags, Squeeze Bottles)</option>
+                    <option value="pp">🥣 PP #5 - Polypropylene (Yogurt Tubs, Straws, Bottle Caps)</option>
+                    <option value="ps">📦 PS #6 - Polystyrene (Styrofoam Cups, Food Clamshells)</option>
+                  </optgroup>
+                  <optgroup label="Paper & Fibre">
+                    <option value="paper">📄 Office Paper & Newsprint (Clean Paper, Documents, Newspapers)</option>
+                    <option value="cardboard">📦 Cardboard & Kraft Paperboard (Shipping Boxes, Cartons)</option>
+                  </optgroup>
+                  <optgroup label="Metals & Glass">
+                    <option value="aluminum">🥫 Aluminum (Beverage Cans, Clean Foil)</option>
+                    <option value="steel">🥫 Steel & Tinplate (Food Cans, Aerosol Tins)</option>
+                    <option value="glass">🍶 Glass Bottles & Food Jars (Bottles, Cullet)</option>
+                  </optgroup>
+                  <optgroup label="Other Streams">
+                    <option value="organic">🌱 Organic Waste (Food scraps, peels, grounds)</option>
+                    <option value="textile">👕 Textiles & Old Fabrics (Cotton, Denim, Scraps)</option>
+                    <option value="electronic">💻 E-Waste (Phones, Chargers, Circuit Boards)</option>
+                    <option value="battery">🔋 Hazardous Batteries (Li-ion, Alkaline, Lead-acid)</option>
+                  </optgroup>
                 </select>
               </div>
 
@@ -617,10 +634,15 @@
                 <select id="corr-material-select" class="w-full rounded-xl border border-slate-300 p-2.5 text-slate-800 outline-none focus:border-indigo-500 bg-white">
                   <option value="Polyethylene Terephthalate (PET, #1)">🧴 PET #1 (Clear Beverage Bottles)</option>
                   <option value="High-Density Polyethylene (HDPE #2)">🧴 HDPE #2 (Milk & Detergent Jugs)</option>
-                  <option value="Aluminum Alloy 3004">🥫 Aluminum (Beverage Cans)</option>
-                  <option value="Corrugated Kraft Paperboard">📦 Cardboard (Shipping Cartons)</option>
-                  <option value="Soda-Lime Silica Glass">🍶 Glass (Jars & Wine Bottles)</option>
+                  <option value="Polyvinyl Chloride (PVC #3)">🧪 PVC #3 (Pipes & Blister Packs)</option>
+                  <option value="Low-Density Polyethylene (LDPE #4)">🛍️ LDPE #4 (Bags & Squeeze Bottles)</option>
                   <option value="Polypropylene (PP 5)">🥣 PP #5 (Tubs & Bottle Caps)</option>
+                  <option value="Polystyrene (PS #6)">📦 PS #6 (Styrofoam & Food Clamshells)</option>
+                  <option value="Office Paper & Newsprint">📄 Paper & Newsprint</option>
+                  <option value="Corrugated Kraft Paperboard">📦 Cardboard (Shipping Cartons)</option>
+                  <option value="Aluminum Alloy 3004">🥫 Aluminum (Beverage Cans)</option>
+                  <option value="Steel / Tinplate">🥫 Steel & Tin Cans</option>
+                  <option value="Soda-Lime Silica Glass">🍶 Glass (Jars & Wine Bottles)</option>
                   <option value="Alkaline Battery Chemistry">🔋 Hazardous Battery (Alkaline / Li-ion)</option>
                 </select>
               </div>
