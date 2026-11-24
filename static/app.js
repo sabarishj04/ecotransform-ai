@@ -220,6 +220,56 @@ function hideScannerError() {
   if (box) box.classList.add('hidden');
 }
 
+// ================= SMART CLARIFICATION MODAL / CARD =================
+function showClarificationDialog(data) {
+  const card = document.getElementById('clarification-card');
+  const qElem = document.getElementById('clarification-question');
+  const optContainer = document.getElementById('clarification-options');
+  if (!card) return;
+
+  state.clarificationData = data;
+  if (qElem) qElem.textContent = data.question || 'Is the container hard or flexible?';
+
+  if (optContainer) {
+    optContainer.innerHTML = '';
+    const options = data.options || ['Hard plastic', 'Flexible film / bag', 'Cardboard', 'Metal'];
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-slate-800 border border-amber-300 hover:bg-amber-100 hover:border-amber-400 shadow-xs transition flex items-center gap-1.5';
+      btn.innerHTML = `<span>${opt}</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-600"></i>`;
+      btn.onclick = () => selectClarificationOption(opt);
+      optContainer.appendChild(btn);
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  card.classList.remove('hidden');
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hideClarificationDialog() {
+  const card = document.getElementById('clarification-card');
+  if (card) card.classList.add('hidden');
+}
+
+function selectClarificationOption(optionText) {
+  state.clarificationAnswer = optionText;
+  hideClarificationDialog();
+  submitUnifiedAnalysis(true, optionText);
+}
+
+function proceedWithoutClarification() {
+  hideClarificationDialog();
+  submitUnifiedAnalysis(true, '');
+}
+
+function cancelClarification() {
+  hideClarificationDialog();
+  const textarea = document.getElementById('text-waste-description');
+  if (textarea) textarea.focus();
+}
+
 function validateScannerForm() {
   const btn = document.getElementById('btn-analyze');
   if (!btn) return;
@@ -228,21 +278,8 @@ function validateScannerForm() {
   if (state.scannerMode === 'camera' || state.scannerMode === 'upload') {
     isValid = !!(state.selectedFile || state.selectedBase64);
   } else if (state.scannerMode === 'barcode') {
-    isValid = !!(state.verifiedProductData || state.manualCorrection || (state.scannedBarcode && state.scannedBarcode.length >= 4));
-  } else if (state.scannerMode === 'barcode') {
     const code = (document.getElementById('barcode-input-field')?.value || state.scannedBarcode || '').trim();
-    if (!code) {
-      showScannerError('Please enter a barcode number or select a verified test sample.');
-      return;
-    }
-    payload = {
-      input_method: 'barcode_scan',
-      barcode: code,
-      manual_correction: state.manualCorrection
-    };
-    if (loadHeader) loadHeader.textContent = 'Verifying Barcode / QR Registry...';
-    if (loadSubtext) loadSubtext.textContent = 'Retrieving manufacturer packaging disclosure and lifecycle metrics...';
-
+    isValid = !!(state.verifiedProductData || state.manualCorrection || code.length >= 3);
   } else if (state.scannerMode === 'text') {
     const textVal = (document.getElementById('text-waste-description')?.value || '').trim();
     isValid = textVal.length >= 3;
@@ -651,6 +688,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const textarea = document.getElementById('text-waste-description');
   if (textarea) {
     textarea.addEventListener('input', () => {
+      validateScannerForm();
+    });
+  }
+
+  // Manual material select listener
+  const manualCategory = document.getElementById('manual-material-select');
+  if (manualCategory) {
+    manualCategory.addEventListener('change', () => {
+      validateScannerForm();
+    });
+  }
+
+  // Barcode input field listener
+  const barcodeInput = document.getElementById('barcode-input-field');
+  if (barcodeInput) {
+    barcodeInput.addEventListener('input', () => {
       validateScannerForm();
     });
   }
