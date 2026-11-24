@@ -13,7 +13,7 @@ from PIL import Image
 import io
 
 import database as db
-from gemini_service import analyze_waste_image, analyze_waste_text, check_text_clarification_needed
+from gemini_service import analyze_waste_image, analyze_waste_text, check_text_clarification_needed, classify_indian_waste_stream
 from impact_calculator import calculate_environmental_impact
 from barcode_service import lookup_barcode_product, VERIFIED_PRODUCT_CATALOG
 from intelligence_engine import fuse_evidence
@@ -139,7 +139,10 @@ def analyze():
                 filename = data.get("filename", "unknown_item.jpg")
                 hint = filename.rsplit(".", 1)[0].replace("_", " ")
                 analysis_result = analyze_waste_text(description=hint, material_hint="")
-                indian_stream = classify_indian_waste_stream(analysis_result)
+                item_name = analysis_result.get("item_name") or hint
+                mat = analysis_result.get("primary_material") or ""
+                haz = bool(analysis_result.get("safety_warnings") or analysis_result.get("is_hazardous"))
+                indian_stream = classify_indian_waste_stream(item_name, mat, haz)
                 analysis_result["indian_waste_stream"] = indian_stream
                 saved_record = db.save_scan_result(session_id, analysis_result, image_preview="")
                 saved_record["input_method"] = "image_upload"
