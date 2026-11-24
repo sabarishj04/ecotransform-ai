@@ -101,65 +101,65 @@ Return strictly a valid JSON object matching this schema without markdown codebl
 # Fallback smart archetypes based on dominant color or filename/preset
 FALLBACK_ARCHETYPES = {
     "plastic": {
-        "item_name": "Clear Plastic Beverage Bottle (500ml)",
-        "primary_material": "Polyethylene Terephthalate (PET, #1)",
-        "physical_condition": "Empty, clean, slightly compressed",
-        "confidence_score": 0.93,
+        "item_name": "Mixed Recyclable Plastics & Bottles (PET/HDPE)",
+        "primary_material": "Polyethylene Terephthalate (PET #1) & HDPE #2",
+        "physical_condition": "Mixed post-consumer rigid plastic containers, cleanable",
+        "confidence_score": 0.94,
         "categories": ["Recyclable", "Reusable"],
         "is_hazardous": False,
-        "identification_reasoning": "Cylindrical profile with standard injection molding gate mark and transparent PET clarity.",
-        "disposal_recommendation": "Rinse, compress to minimize bin volume, replace cap, and place into dry recycling.",
-        "estimated_weight_kg": 0.025,
+        "identification_reasoning": "Visible thermoformed transparent containers, blow-molded bottles, and jugs characteristic of recyclable domestic packaging.",
+        "disposal_recommendation": "Rinse out residual food/liquid, flatten containers to save volume, and place in municipal dry recyclables bin.",
+        "estimated_weight_kg": 0.085,
         "upcycle_recommendations": [
             {
-                "product_name": "Self-Watering Microgreen Planter",
+                "product_name": "Vertical Self-Watering Planter Tower",
                 "difficulty": "Easy",
-                "estimated_time_mins": 15,
-                "estimated_cost_usd": 0.50,
-                "potential_value_usd": 8.00,
-                "materials_needed": ["500ml PET bottle", "Cotton yarn or twine", "Potting soil", "Seeds"],
-                "tools_needed": ["Scissors or hobby knife"],
-                "safety_precautions": ["Cut edges of plastic can be sharp; tape or sand edges smooth."],
-                "steps": [
-                    "Cut the bottle in half horizontally 10cm from the base.",
-                    "Invert the funnel-shaped top half into the bottom reservoir.",
-                    "Thread a cotton string through the bottle opening to act as a capillary wick.",
-                    "Add potting soil to top, sow seeds, and fill base with water."
-                ],
-                "sustainability_benefit": "Reuses single-use plastic and grows healthy domestic greens with zero food miles."
-            },
-            {
-                "product_name": "Desk Cable & Cord Organizer",
-                "difficulty": "Easy",
-                "estimated_time_mins": 10,
-                "estimated_cost_usd": 0.00,
-                "potential_value_usd": 4.50,
-                "materials_needed": ["Center cylindrical plastic sleeve"],
-                "tools_needed": ["Scissors"],
-                "safety_precautions": ["Trim any sharp corners."],
-                "steps": [
-                    "Cut away the top cone and bottom base.",
-                    "Cut the remaining clear cylinder into a continuous 1.5cm spiral strip.",
-                    "Wrap the flexible spiral around tangled power cords."
-                ],
-                "sustainability_benefit": "Replaces virgin commercial plastic spiral wraps."
-            },
-            {
-                "product_name": "Hanging Backyard Bird Feeder",
-                "difficulty": "Medium",
                 "estimated_time_mins": 25,
                 "estimated_cost_usd": 1.00,
-                "potential_value_usd": 12.00,
-                "materials_needed": ["Bottle with cap", "Two wooden chopsticks or pencils", "Twine", "Bird seed"],
-                "tools_needed": ["Craft knife or hole punch"],
-                "safety_precautions": ["Puncture bottle slowly on a firm flat surface."],
+                "potential_value_usd": 15.00,
+                "materials_needed": ["Plastic bottles and milk jugs", "Cotton string or wicks", "Potting soil", "Seeds"],
+                "tools_needed": ["Utility knife or scissors", "Twine for hanging"],
+                "safety_precautions": ["Smooth down cut plastic edges with sandpaper or protective tape."],
                 "steps": [
-                    "Pierce opposing holes through the bottle sides and insert chopsticks as perches.",
-                    "Carve small 1cm feed dispensing holes 2cm above each perch.",
-                    "Tie twine securely under the neck rim for suspension.",
-                    "Fill with seed and hang from a tree branch."
+                    "Cut rectangular access windows along the sides of each plastic bottle.",
+                    "Thread a sturdy cotton wick through the bottle caps to allow capillary water flow.",
+                    "Stack bottles vertically, linking necks into lower bases.",
+                    "Fill with potting soil, sow herbs or greens, and irrigate from the top reservoir."
                 ],
-                "sustainability_benefit": "Extends polymer lifespan and nurtures local bird wildlife."
+                "sustainability_benefit": "Diverts multiple plastic bottles while creating a zero-footprint domestic vertical herb garden."
+            },
+            {
+                "product_name": "High-Density Ecobrick Building Blocks",
+                "difficulty": "Medium",
+                "estimated_time_mins": 30,
+                "estimated_cost_usd": 0.00,
+                "potential_value_usd": 8.00,
+                "materials_needed": ["Clean plastic bottles", "Non-recyclable clean plastic packaging/wrappers"],
+                "tools_needed": ["Wooden dowel or stick"],
+                "safety_precautions": ["Ensure all plastic stuffed inside is completely dry to prevent mold growth."],
+                "steps": [
+                    "Collect clean, dry plastic bottles and wrappers.",
+                    "Use a wooden stick to compress plastic wrappers tightly inside the bottle until dense and rigid.",
+                    "Ensure a minimum density of 0.33g/ml (feels like a solid brick).",
+                    "Use ecobricks to build raised garden bed walls, outdoor seating, or insulation structures."
+                ],
+                "sustainability_benefit": "Sequesters non-recyclable plastic into durable, weather-resistant building modules."
+            },
+            {
+                "product_name": "Modular Drawer & Workshop Organizers",
+                "difficulty": "Easy",
+                "estimated_time_mins": 15,
+                "estimated_cost_usd": 0.20,
+                "potential_value_usd": 6.50,
+                "materials_needed": ["Bases of plastic bottles and milk jugs"],
+                "tools_needed": ["Utility scissors", "Edge tape or iron for smoothing"],
+                "safety_precautions": ["Trim any sharp corners flush."],
+                "steps": [
+                    "Cut the bottom 6cm bases off assorted bottles and jugs.",
+                    "Gently touch the cut rim to a warm clothes iron covered in baking parchment to roll the edge smooth.",
+                    "Arrange into drawer trays to sort hardware, screws, crafts, and office stationery."
+                ],
+                "sustainability_benefit": "Replaces purchased plastic drawer divider sets with 100% recycled containers."
             }
         ]
     },
@@ -451,30 +451,31 @@ def _generate_heuristic_analysis(image_bytes: bytes, filename: str = "") -> dict
 
     if any(k in fn_lower for k in ["battery", "cell", "hazard", "lithium", "electronic", "duracell", "energizer", "aa", "aaa"]):
         selected_key = "battery"
-    elif any(k in fn_lower for k in ["can", "soda", "coke", "beer"]):
-        selected_key = "aluminum"
     elif any(k in fn_lower for k in ["cardboard", "box", "package", "carton"]):
         selected_key = "cardboard"
+    elif any(k in fn_lower for k in ["plastic", "bottle", "jug", "cup", "pet", "hdpe", "container"]):
+        selected_key = "plastic"
+    elif any(k in fn_lower for k in ["can", "soda", "coke", "beer", "aluminum"]):
+        selected_key = "aluminum"
     else:
-        # Inspect image pixels and geometric properties using Pillow
         try:
             img = Image.open(io.BytesIO(image_bytes))
             orig_w, orig_h = img.size
             aspect = max(orig_w, orig_h) / max(min(orig_w, orig_h), 1)
 
-            # Convert to grayscale and downsample
-            gray = img.convert('L')
-            small_gray = gray.resize((100, 100))
-            pixels = list(small_gray.getdata())
-
-            # Find object bounding box by contrast against background
-            # Calculate mean and standard deviation
-            mean_lum = sum(pixels) / len(pixels)
-            high_contrast_pixels = [p for p in pixels if abs(p - mean_lum) > 30]
-
-            img_rgb = img.resize((50, 50))
-            colors = img_rgb.getcolors(maxcolors=2500)
+            # Crop central 60% of the image to ignore surrounding white web borders or desk edges
+            crop_box = (
+                int(orig_w * 0.2),
+                int(orig_h * 0.2),
+                int(orig_w * 0.8),
+                int(orig_h * 0.8)
+            )
+            cropped = img.crop(crop_box)
             
+            # Analyze colors of cropped center
+            small_rgb = cropped.resize((40, 40))
+            colors = small_rgb.getcolors(maxcolors=2000)
+
             avg_r = avg_g = avg_b = 128
             if colors:
                 pixel_count = sum(c[0] for c in colors)
@@ -482,23 +483,19 @@ def _generate_heuristic_analysis(image_bytes: bytes, filename: str = "") -> dict
                 avg_g = sum(c[1][1] * c[0] for c in colors) / pixel_count
                 avg_b = sum(c[1][2] * c[0] for c in colors) / pixel_count
 
-            # Slender cylindrical object (like a standalone AA/AAA battery on a table)
-            # Battery signature: aspect ratio or centralized high-contrast small vertical cylinder
-            has_blue_white_or_black = (avg_b > avg_r and avg_b > avg_g) or (avg_r < 90 and avg_g < 90 and avg_b < 90)
+            # If image is an isolated slender battery (aspect > 1.8 in orientation)
+            # and contains blue, dark, or metallic battery casing
+            is_slender_cell = (orig_h > 1.6 * orig_w) or (orig_w > 2.2 * orig_h)
 
-            # Check if image has a central vertical cylinder
-            # When someone shoots a battery on a surface, the object occupies a narrow vertical strip
-            if aspect > 1.3 or has_blue_white_or_black:
-                # If it's slender with cylindrical metallic/blue/white tones, it is a battery
+            if is_slender_cell:
                 selected_key = "battery"
-            elif avg_r > 130 and avg_g > 100 and avg_b < 80:
+            elif avg_r > 130 and avg_g > 100 and avg_b < 75:
                 selected_key = "cardboard"
-            elif abs(avg_r - avg_g) < 15 and abs(avg_g - avg_b) < 15 and avg_r > 160:
-                selected_key = "aluminum"
             else:
+                # Default for mixed containers, bottles, cups, jugs, and packaging
                 selected_key = "plastic"
         except Exception:
-            selected_key = "battery"
+            selected_key = "plastic"
 
     template = FALLBACK_ARCHETYPES.get(selected_key, FALLBACK_ARCHETYPES["battery"])
     impact = calculate_environmental_impact(
